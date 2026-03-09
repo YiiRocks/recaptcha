@@ -1,13 +1,15 @@
 {
-    "name": "yiirocks/ext-template",
-    "description": "Template for Yii.Rocks extensions",
+    "name": "yiirocks/recaptcha",
+    "description": "reCAPTCHA bot protection and online fraud prevention",
     "type": "library",
     "keywords": [
         "yii",
         "yii3",
-        "extension"
+        "extension",
+        "recaptcha",
+        "google"
     ],
-    "homepage": "https://www.yii.rocks/ext-template/",
+    "homepage": "https://www.yii.rocks/recaptcha/",
     "license": "MIT",
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -19,11 +21,17 @@
         }
     ],
     "support": {
-        "issues": "https://github.com/YiiRocks/ext-template/issues",
-        "source": "https://github.com/YiiRocks/ext-template/tree/master"
+        "issues": "https://github.com/YiiRocks/recaptcha/issues",
+        "source": "https://github.com/YiiRocks/recaptcha/tree/master"
     },
     "require": {
-        "php": ">=8.2"
+        "php": ">=8.2",
+        "yiisoft/validator": "^2.5",
+        "yiisoft/di": "^1.2",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.0 || ^2.0",
+        "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "@stable",
@@ -32,17 +40,16 @@
         "squizlabs/php_codesniffer": "@stable",
         "vimeo/psalm": "@stable",
         "yiisoft/config": "^1.6",
-        "yiisoft/di": "*",
-        "yiisoft/files": "^2.0"
+        "yiisoft/test-support": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "YiiRocks\\ExtTemplate\\": "src"
+            "YiiRocks\\Recaptcha\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "YiiRocks\\ExtTemplate\\tests\\": "tests"
+            "YiiRocks\\Recaptcha\\tests\\": "tests"
         }
     },
     "repositories": [
@@ -73,8 +80,12 @@
             "source-directory": "config"
         },
         "config-plugin": {
-            "params": "params.php",
-            "web": "web.php"
+            "params": "params.php"
+        },
+        "yiisoft/di": {
+            "providers": [
+                "YiiRocks\\Recaptcha\\RecaptchaServiceProvider"
+            ]
         }
     },
     "config": {
