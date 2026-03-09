@@ -7,6 +7,7 @@ namespace YiiRocks\Recaptcha;
 use YiiRocks\Recaptcha\Form\RecaptchaRule;
 use YiiRocks\Recaptcha\Form\RecaptchaRuleHandler;
 use YiiRocks\Recaptcha\Middleware\RecaptchaMiddleware;
+use YiiRocks\Recaptcha\Widget\RecaptchaWidget;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -72,6 +73,12 @@ final class RecaptchaServiceProvider implements ServiceProviderInterface
                     client:          $c->get(RecaptchaClient::class),
                     config:          $c->get(RecaptchaConfig::class),
                     responseFactory: $c->get(ResponseFactoryInterface::class),
+                );
+            },
+
+            RecaptchaWidget::class => static function (Container $c): RecaptchaWidget {
+                return new RecaptchaWidget(
+                    config: $c->get(RecaptchaConfig::class),
                 );
             },
         ];

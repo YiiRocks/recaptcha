@@ -17,41 +17,31 @@ composer require yiirocks/recaptcha
 
 ## Usage
 
-Copy `config/params.php` into your app's params and fill in your Google keys:
-
-```php
-// config/params.php
-return [
-    'recaptcha' => [
-        'siteKey'   => $_ENV['RECAPTCHA_SITE_KEY'],
-        'secretKey' => $_ENV['RECAPTCHA_SECRET_KEY'],
-        'version'   => \YiiRocks\Recaptcha\RecaptchaConfig::VERSION_V2_CHECKBOX,
-        // v3 only:
-        // 'v3ScoreThreshold' => 0.5,
-        // 'v3Action'         => 'submit',
-    ],
-];
-```
-
-Available versions:
-- `RecaptchaConfig::VERSION_V2_CHECKBOX` *(default)*
-- `RecaptchaConfig::VERSION_V2_INVISIBLE`
-- `RecaptchaConfig::VERSION_V3`
-
----
-
-## Usage
-
 ### 1. Rendering the widget in a view
+
+Inject `RecaptchaWidget` into your action — no config needed in the view:
 
 ```php
 use YiiRocks\Recaptcha\Widget\RecaptchaWidget;
 
-// Injected via DI or fetched from container
-echo RecaptchaWidget::create($config)->render();
+class ContactAction
+{
+    public function __construct(private readonly RecaptchaWidget $recaptcha) {}
 
-// With options
-echo RecaptchaWidget::create($config)
+    public function __invoke(): ResponseInterface
+    {
+        // pass $this->recaptcha to the view
+    }
+}
+```
+
+Then in the view:
+
+```php
+echo $recaptcha->render();
+
+// With options:
+echo $recaptcha
     ->withTheme('dark')          // 'light' (default) | 'dark'
     ->withSize('compact')        // 'normal' (default) | 'compact'
     ->withCallback('myCallback') // JS function name called on success
@@ -131,13 +121,13 @@ class ContactAction
 
 ## Unit testing
 
-The package is tested with [PHPUnit](https://phpunit.de/). To run tests:
+The package is tested with [Psalm](https://psalm.dev/) and [PHPUnit](https://phpunit.de/). To run tests:
 
 ```bash
-./vendor/bin/phpunit
+composer psalm
+composer phpunit
 ```
 
 [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/YiiRocks/recaptcha.svg)](https://codeclimate.com/github/YiiRocks/recaptcha/maintainability)
 [![Codacy branch grade](https://img.shields.io/codacy/grade/<uniqid>/master.svg)](https://app.codacy.com/gh/YiiRocks/recaptcha)
-[![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/yiirocks/recaptcha/master.svg)](https://scrutinizer-ci.com/g/yiirocks/recaptcha/?branch=master)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/yiirocks/recaptcha/analysis)

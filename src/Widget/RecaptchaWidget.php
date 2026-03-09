@@ -9,20 +9,27 @@ use YiiRocks\Recaptcha\RecaptchaConfig;
 /**
  * Renders the reCAPTCHA widget HTML and script tag.
  *
- * Basic usage in a view:
+ * RecaptchaWidget is a DI service — inject it directly into your action or view model:
  *
  * ```php
- * echo RecaptchaWidget::create($config)->render();
+ * class ContactAction
+ * {
+ *     public function __construct(private readonly RecaptchaWidget $recaptcha) {}
+ *
+ *     public function __invoke(): ResponseInterface
+ *     {
+ *         // pass $this->recaptcha to the view
+ *     }
+ * }
  * ```
  *
- * With custom attributes:
+ * Then in the view:
  *
  * ```php
- * echo RecaptchaWidget::create($config)
- *     ->withTheme('dark')
- *     ->withSize('compact')
- *     ->withCallback('onRecaptchaSuccess')
- *     ->render();
+ * echo $recaptcha->render();
+ *
+ * // With options:
+ * echo $recaptcha->withTheme('dark')->withSize('compact')->render();
  * ```
  */
 final class RecaptchaWidget
@@ -37,11 +44,6 @@ final class RecaptchaWidget
     private bool    $includeScript   = true;
 
     public function __construct(private readonly RecaptchaConfig $config) {}
-
-    public static function create(RecaptchaConfig $config): self
-    {
-        return new self($config);
-    }
 
     public function withTheme(string $theme): self
     {
@@ -92,7 +94,7 @@ final class RecaptchaWidget
         return $clone;
     }
 
-    /** Skip rendering the &lt;script&gt; tag if you load it separately. */
+    /** Skip rendering the <script> tag if you load it separately. */
     public function withoutScript(): self
     {
         $clone = clone $this;
