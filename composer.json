@@ -1,0 +1,86 @@
+{
+    "name": "yiirocks/ext-template",
+    "description": "Template for Yii.Rocks extensions",
+    "type": "library",
+    "keywords": [
+        "yii",
+        "yii3",
+        "extension"
+    ],
+    "homepage": "https://www.yii.rocks/ext-template/",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Mr.42",
+            "homepage": "https://mr42.me/",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/YiiRocks/ext-template/issues",
+        "source": "https://github.com/YiiRocks/ext-template/tree/master"
+    },
+    "require": {
+        "php": ">=8.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "@stable",
+        "phpmd/phpmd": "@stable",
+        "phpunit/phpunit": "@stable",
+        "squizlabs/php_codesniffer": "@stable",
+        "vimeo/psalm": "@stable",
+        "yiisoft/config": "^1.6",
+        "yiisoft/di": "*",
+        "yiisoft/files": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "YiiRocks\\ExtTemplate\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "YiiRocks\\ExtTemplate\\tests\\": "tests"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "scripts": {
+        "php-cs-fixer": "@php vendor/bin/php-cs-fixer fix",
+        "phpcs": "@php vendor/bin/phpcs",
+        "phpmd": "@php vendor/bin/phpmd src/ text tests/data/phpmd_ruleset.xml",
+        "phpunit": "@php vendor/bin/phpunit",
+        "psalm": "@php vendor/bin/psalm"
+    },
+    "scripts-descriptions": {
+        "php-cs-fixer": "Cleans to code with PHP Coding Standards Fixer.",
+        "phpcs": "PHP_CodeSniffer tokenizes PHP, JavaScript and CSS files and detects violations of a defined set of coding standards.",
+        "phpmd": "PHP Mess Detector.",
+        "phpunit": "PHPUnit - programmer-oriented testing framework.",
+        "psalm": "Psalm - static analysis tool for finding errors in PHP applications."
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
+        "config-plugin-options": {
+            "source-directory": "config"
+        },
+        "config-plugin": {
+            "params": "params.php",
+            "web": "web.php"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "yiisoft/config": true
+        }
+    }
+}
