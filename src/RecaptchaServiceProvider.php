@@ -30,7 +30,7 @@ final class RecaptchaServiceProvider implements ServiceProviderInterface
                 /** @var array<string, array<string, mixed>> $params */
                 $params = $c->get('params');
                 /** @var array<string, mixed> $cfg */
-                $cfg = $params['recaptcha'] ?? [];
+                $cfg = $params['yiirocks/recaptcha'] ?? [];
 
                 $siteKey = isset($cfg['siteKey']) && is_string($cfg['siteKey'])
                     ? $cfg['siteKey']

@@ -12,7 +12,7 @@ declare(strict_types=1);
 use YiiRocks\Recaptcha\RecaptchaConfig;
 
 return [
-    'recaptcha' => [
+    'yiirocks/recaptcha' => [
         // ── Required ────────────────────────────────────────────────────────
         'siteKey'   => $_ENV['RECAPTCHA_SITE_KEY']   ?? 'YOUR_SITE_KEY',
         'secretKey' => $_ENV['RECAPTCHA_SECRET_KEY'] ?? 'YOUR_SECRET_KEY',
