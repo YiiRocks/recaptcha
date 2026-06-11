@@ -4,11 +4,21 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha;
 
+use Yiisoft\Translator\TranslatorInterface;
 use Yiisoft\Widget\Widget;
 
 final class RecaptchaV3 extends Widget
 {
     private const DefaultJsApiUrl = 'https://www.google.com/recaptcha/api.js';
+
+    private const PrivacyUrl = 'https://policies.google.com/privacy';
+    private const TermsUrl = 'https://policies.google.com/terms';
+
+    private const DefaultLegalNotice = 'This site is protected by reCAPTCHA and the Google '
+        . '<a href="' . self::PrivacyUrl . '">Privacy Policy</a> and '
+        . '<a href="' . self::TermsUrl . '">Terms of Service</a> apply.';
+
+    private const LegalNoticeMessageId = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
 
     private ?string $siteKey = null;
     private string $action = 'submit';
@@ -17,6 +27,7 @@ final class RecaptchaV3 extends Widget
     private string $formId = '';
     private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
     private string $jsApiUrl = self::DefaultJsApiUrl;
+    private ?TranslatorInterface $translator = null;
 
     public function withSiteKey(string $siteKey): self
     {
@@ -64,6 +75,13 @@ final class RecaptchaV3 extends Widget
     {
         $new = clone $this;
         $new->jsApiUrl = $url;
+        return $new;
+    }
+
+    public function withTranslator(?TranslatorInterface $translator): self
+    {
+        $new = clone $this;
+        $new->translator = $translator;
         return $new;
     }
 
@@ -127,15 +145,35 @@ final class RecaptchaV3 extends Widget
         }
 
         if ($this->badge === RecaptchaV3Badge::Hidden) {
+            $privacyLink = '<a href="' . self::PrivacyUrl . '">'
+                . $this->translate('Privacy Policy') . '</a>';
+            $termsLink = '<a href="' . self::TermsUrl . '">'
+                . $this->translate('Terms of Service') . '</a>';
+
+            $notice = $this->translator !== null
+                ? $this->translator->translate(
+                    self::LegalNoticeMessageId,
+                    ['privacyPolicy' => $privacyLink, 'termsOfService' => $termsLink],
+                    'yii3-recaptcha',
+                )
+                : self::DefaultLegalNotice;
+
             $html .= "\n" . '<div style="font-size:0.8em;margin-top:0.5em;">'
-                . 'This site is protected by reCAPTCHA and the Google '
-                . '<a href="https://policies.google.com/privacy">Privacy Policy</a> and '
-                . '<a href="https://policies.google.com/terms">Terms of Service</a> apply.'
+                . $notice
                 . '</div>';
         }
 
         $html .= "\n";
 
         return $html;
+    }
+
+    private function translate(string $message): string
+    {
+        if ($this->translator !== null) {
+            return $this->translator->translate($message, [], 'yii3-recaptcha');
+        }
+
+        return $message;
     }
 }
