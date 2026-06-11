@@ -158,7 +158,7 @@ final class RecaptchaV3 extends Widget
                 )
                 : self::DefaultLegalNotice;
 
-            $html .= "\n" . '<div style="font-size:0.8em;margin-top:0.5em;">'
+            $html .= "\n" . '<div>'
                 . $notice
                 . '</div>';
         }
