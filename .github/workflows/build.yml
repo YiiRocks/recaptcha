@@ -1,0 +1,27 @@
+name: build
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  phpunit:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: pcov
+          tools: composer:v2
+      - run: composer install --prefer-dist --no-progress
+      - run: vendor/bin/phpunit --coverage-clover=coverage.xml
+      - uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml

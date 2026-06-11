@@ -1,0 +1,93 @@
+{
+    "name": "yiirocks/recaptcha",
+    "description": "Google reCAPTCHA v2 and v3 widget and server-side validator for Yii3.",
+    "type": "library",
+    "keywords": [
+        "yii",
+        "yii3",
+        "extension",
+        "recaptcha",
+        "captcha",
+        "widget",
+        "validator",
+        "spam",
+        "bot"
+    ],
+    "homepage": "https://www.yii.rocks/recaptcha/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mr.42",
+            "homepage": "https://mr42.me/",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/YiiRocks/recaptcha/issues",
+        "source": "https://github.com/YiiRocks/recaptcha/tree/master"
+    },
+    "require": {
+        "php": ">=8.3",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.0 || ^2.0",
+        "yiisoft/html": "^3.13 || ^4.0",
+        "yiisoft/request-provider": "^1.3",
+        "yiisoft/translator": "^3.0",
+        "yiisoft/validator": "^2.5",
+        "yiisoft/widget": "^2.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "@stable",
+        "nyholm/psr7": "@stable",
+        "phpunit/phpunit": "@stable",
+        "psr/container": "^2.0",
+        "vimeo/psalm": "@stable",
+        "yiisoft/translator-message-php": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "YiiRocks\\Recaptcha\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "YiiRocks\\Recaptcha\\Tests\\": "tests/"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+    "scripts": {
+        "php-cs-fixer": "@php vendor/bin/php-cs-fixer fix",
+        "phpunit": "@php vendor/bin/phpunit",
+        "psalm": "@php vendor/bin/psalm"
+    },
+    "scripts-descriptions": {
+        "php-cs-fixer": "Cleans to code with PHP Coding Standards Fixer.",
+        "phpunit": "PHPUnit - programmer-oriented testing framework.",
+        "psalm": "Psalm - static analysis tool for finding errors in PHP applications."
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
+        "config-plugin": {
+            "bootstrap": "bootstrap.php",
+            "di": "di.php",
+            "params": "params.php"
+        },
+        "config-plugin-options": {
+            "source-directory": "config"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "yiisoft/config": true
+        }
+    }
+}
