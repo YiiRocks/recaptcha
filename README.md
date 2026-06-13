@@ -139,7 +139,7 @@ Available options:
 | Method | Default | Description |
 |---|---|---|
 | `withSiteKey(string)` | from config | Google reCAPTCHA v3 site key |
-| `withAction(string)` | `'submit'` | Action name sent to Google |
+| `withAction(string)` | `''` | Action name sent to Google (must match the rule's `action` if set) |
 | `withFormId(string)` | — | Explicit form ID (auto-resolved via `closest("form")` if omitted) |
 | `withBadge(RecaptchaV3Badge)` | `BottomRight` | `BottomRight`, `BottomLeft`, or `Hidden` |
 | `withJsApiUrl(string)` | Google CDN | Custom JS API URL |
@@ -190,6 +190,11 @@ final class LoginForm
     public string $gRecaptchaResponse = '';
 }
 ```
+
+> **Important:** If you set `->withAction('...')` on the field, you must also set
+> `action: '...'` on the rule with the same value. Otherwise Google will return a
+> different action and validation will fail with "The CAPTCHA action does not
+> match." If neither is set, no action is sent and the check is skipped entirely.
 
 | v3 rule parameter | Default | Description |
 |---|---|---|
