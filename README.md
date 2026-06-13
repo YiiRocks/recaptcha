@@ -128,7 +128,9 @@ Available options:
 
 ### reCAPTCHA v3
 
-Site key is pulled from the registry automatically when the config is set up:
+Site key is pulled from the registry automatically when the config is set up.
+The reCAPTCHA token is fetched on form submit (not on page load), preventing
+unexpected challenge popups:
 
 ```php
 use YiiRocks\Recaptcha\RecaptchaV3;
@@ -137,7 +139,8 @@ use YiiRocks\Recaptcha\RecaptchaV3Badge;
 echo RecaptchaV3::widget()->render();  // site key from config
 ```
 
-To use an explicit site key or configure additional options:
+The form is auto-resolved via `closest("form")`. If the hidden input is outside
+the form, pass `withFormId()` to target a specific form element:
 
 ```php
 echo RecaptchaV3::widget()
@@ -156,7 +159,7 @@ Available options:
 | `withAction(string)` | `'submit'` | Action name sent to Google |
 | `withFieldName(string)` | `'g-recaptcha-response'` | Hidden input name attribute |
 | `withFieldId(string)` | `'{fieldName}-{uniqid}'` | Hidden input ID attribute |
-| `withFormId(string)` | — | Form ID for automatic submit binding |
+| `withFormId(string)` | — | Explicit form ID (auto-resolved if omitted) |
 | `withBadge(RecaptchaV3Badge)` | `BottomRight` | `BottomRight`, `BottomLeft`, or `Hidden` |
 | `withJsApiUrl(string)` | Google CDN | Custom JS API URL |
 | `withTranslator(?TranslatorInterface)` | from registry | Translator for the hidden badge legal notice |

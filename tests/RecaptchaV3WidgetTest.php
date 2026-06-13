@@ -37,6 +37,8 @@ final class RecaptchaV3WidgetTest extends TestCase
         $this->assertStringContainsString('render=6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI', $html);
         $this->assertStringContainsString('type="hidden"', $html);
         $this->assertStringContainsString('grecaptcha.execute', $html);
+        $this->assertStringContainsString('closest("form")', $html);
+        $this->assertStringContainsString('addEventListener("submit"', $html);
     }
 
     public function testRenderWithCustomAction(): void
@@ -57,6 +59,7 @@ final class RecaptchaV3WidgetTest extends TestCase
             ->render();
 
         $this->assertStringContainsString('"formId":"login-form"', $html);
+        $this->assertStringContainsString('document.getElementById(o.formId)', $html);
         $this->assertStringContainsString('addEventListener("submit"', $html);
     }
 

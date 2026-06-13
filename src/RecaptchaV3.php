@@ -126,23 +126,16 @@ final class RecaptchaV3 extends Widget
         $html .= '(function(){';
         $html .= 'var o=' . $jsOptions . ';';
         $html .= 'var f=document.getElementById(o.fieldId);';
-        $html .= 'grecaptcha.ready(function(){';
-
-        if ($this->formId !== '') {
-            $html .= 'document.getElementById(o.formId).addEventListener("submit",function(e){';
-            $html .= 'e.preventDefault();';
-            $html .= 'grecaptcha.execute(o.siteKey,{action:o.action}).then(function(t){';
-            $html .= 'f.value=t;';
-            $html .= 'HTMLFormElement.prototype.submit.call(this);';
-            $html .= '});';
-            $html .= '});';
-        } else {
-            $html .= 'grecaptcha.execute(o.siteKey,{action:o.action}).then(function(t){';
-            $html .= 'f.value=t;';
-            $html .= '});';
-        }
-
+        $html .= 'var form=o.formId?document.getElementById(o.formId):f.closest("form");';
+        $html .= 'if(form){';
+        $html .= 'form.addEventListener("submit",function(e){';
+        $html .= 'e.preventDefault();';
+        $html .= 'grecaptcha.execute(o.siteKey,{action:o.action}).then(function(t){';
+        $html .= 'f.value=t;';
+        $html .= 'HTMLFormElement.prototype.submit.call(this);';
         $html .= '});';
+        $html .= '});';
+        $html .= '}';
         $html .= '})();';
         $html .= '</script>';
 
