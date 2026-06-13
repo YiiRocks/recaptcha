@@ -30,7 +30,7 @@ final class RecaptchaV3Field extends InputField
     private const LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
 
     private ?string $siteKey = null;
-    private string $action = 'submit';
+    private string $action = '';
     private string $formId = '';
     private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
     private string $jsApiUrl = self::DEFAULT_JS_API_URL;
@@ -176,7 +176,11 @@ final class RecaptchaV3Field extends InputField
         }
         $html .= 'try{';
         $html .= 'if(typeof grecaptcha!=="undefined"&&typeof grecaptcha.execute==="function"){';
-        $html .= 'grecaptcha.execute(o.siteKey,{action:o.action}).then(function(t){';
+        if ($this->action !== '') {
+            $html .= 'grecaptcha.execute(o.siteKey,{action:o.action}).then(function(t){';
+        } else {
+            $html .= 'grecaptcha.execute(o.siteKey).then(function(t){';
+        }
         $html .= 'f.value=t;submitForm();';
         $html .= '})["catch"](function(){submitForm();});';
         $html .= '}else{submitForm();}';
