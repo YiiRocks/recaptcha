@@ -85,9 +85,13 @@ final class RecaptchaV2 extends Widget
 
     public function render(): string
     {
-        if ($this->siteKey === null || $this->siteKey === '') {
+        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()?->siteKeyV2;
+
+        if ($siteKey === null || $siteKey === '') {
             throw new \RuntimeException('Site key must be set before rendering.');
         }
+
+        $this->siteKey = $siteKey;
 
         $id = $this->id !== '' ? $this->id : 'g-recaptcha-' . uniqid();
 

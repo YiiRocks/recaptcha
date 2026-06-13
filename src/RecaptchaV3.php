@@ -87,9 +87,13 @@ final class RecaptchaV3 extends Widget
 
     public function render(): string
     {
-        if ($this->siteKey === null || $this->siteKey === '') {
+        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()?->siteKeyV3;
+
+        if ($siteKey === null || $siteKey === '') {
             throw new \RuntimeException('Site key must be set before rendering.');
         }
+
+        $this->siteKey = $siteKey;
 
         $fieldId = $this->fieldId !== '' ? $this->fieldId : $this->fieldName . '-' . uniqid();
         $apiUrl = $this->jsApiUrl . '?render=' . $this->siteKey;

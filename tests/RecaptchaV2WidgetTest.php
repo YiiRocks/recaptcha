@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha\Tests;
 
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientInterface;
+use YiiRocks\Recaptcha\RecaptchaClient;
+use YiiRocks\Recaptcha\RecaptchaConfig;
+use YiiRocks\Recaptcha\RecaptchaRegistry;
 use YiiRocks\Recaptcha\RecaptchaV2;
 use YiiRocks\Recaptcha\RecaptchaV2Size;
 use YiiRocks\Recaptcha\RecaptchaV2Theme;
@@ -79,10 +84,37 @@ final class RecaptchaV2WidgetTest extends TestCase
 
     public function testThrowsWithoutSiteKey(): void
     {
+        RecaptchaRegistry::configure(
+            new RecaptchaClient(
+                new RecaptchaConfig(),
+                $this->createStub(ClientInterface::class),
+                new Psr17Factory(),
+                new Psr17Factory(),
+            ),
+        );
+
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Site key must be set');
 
         RecaptchaV2::widget()->render();
+    }
+
+    public function testRenderUsesSiteKeyFromRegistry(): void
+    {
+        RecaptchaRegistry::configure(
+            new RecaptchaClient(
+                new RecaptchaConfig(
+                    siteKeyV2: 'registry-key-v2',
+                ),
+                $this->createStub(ClientInterface::class),
+                new Psr17Factory(),
+                new Psr17Factory(),
+            ),
+        );
+
+        $html = RecaptchaV2::widget()->render();
+
+        $this->assertStringContainsString('data-sitekey="registry-key-v2"', $html);
     }
 
     public function testRenderWithCustomJsApiUrl(): void
@@ -106,5 +138,17 @@ final class RecaptchaV2WidgetTest extends TestCase
         $this->assertNotNull($m1[1] ?? null);
         $this->assertNotNull($m2[1] ?? null);
         $this->assertNotSame($m1[1], $m2[1]);
+    }
+
+    protected function tearDown(): void
+    {
+        RecaptchaRegistry::configure(
+            new RecaptchaClient(
+                new RecaptchaConfig(),
+                $this->createStub(ClientInterface::class),
+                new Psr17Factory(),
+                new Psr17Factory(),
+            ),
+        );
     }
 }

@@ -18,6 +18,11 @@ final readonly class RecaptchaClient
         private StreamFactoryInterface $streamFactory,
     ) {}
 
+    public function getConfig(): RecaptchaConfig
+    {
+        return $this->config;
+    }
+
     public function verify(string $token, ?string $clientIp = null): VerificationResult
     {
         return $this->doVerify($token, $this->config->secretV2, $clientIp);
