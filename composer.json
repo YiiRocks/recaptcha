@@ -1,6 +1,6 @@
 {
     "name": "yiirocks/recaptcha",
-    "description": "Google reCAPTCHA v2 and v3 widget and server-side validator for Yii3.",
+    "description": "Google reCAPTCHA v2 and v3 field + server-side validator for Yii3.",
     "type": "library",
     "keywords": [
         "yii",
