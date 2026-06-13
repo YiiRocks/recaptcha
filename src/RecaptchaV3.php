@@ -95,6 +95,8 @@ final class RecaptchaV3 extends Widget
 
         $this->siteKey = $siteKey;
 
+        $this->translator ??= RecaptchaRegistry::translator();
+
         $fieldId = $this->fieldId !== '' ? $this->fieldId : $this->fieldName . '-' . uniqid();
         $apiUrl = $this->jsApiUrl . '?render=' . $this->siteKey;
 

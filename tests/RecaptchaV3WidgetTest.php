@@ -7,6 +7,7 @@ namespace YiiRocks\Recaptcha\Tests;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
+use Yiisoft\Translator\TranslatorInterface;
 use YiiRocks\Recaptcha\RecaptchaClient;
 use YiiRocks\Recaptcha\RecaptchaConfig;
 use YiiRocks\Recaptcha\RecaptchaRegistry;
@@ -15,6 +16,18 @@ use YiiRocks\Recaptcha\RecaptchaV3Badge;
 
 final class RecaptchaV3WidgetTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        RecaptchaRegistry::configure(
+            new RecaptchaClient(
+                new RecaptchaConfig(),
+                $this->createStub(ClientInterface::class),
+                new Psr17Factory(),
+                new Psr17Factory(),
+            ),
+        );
+    }
+
     public function testRenderWithSiteKey(): void
     {
         $html = RecaptchaV3::widget()
@@ -97,6 +110,49 @@ final class RecaptchaV3WidgetTest extends TestCase
         RecaptchaV3::widget()->render();
     }
 
+    public function testRenderUsesTranslatorFromRegistry(): void
+    {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('translate')
+            ->willReturnCallback(function (string $id, array $params, string $category): string {
+                return match ($id) {
+                    'Privacy Policy' => 'Datenschutzerklärung',
+                    'Terms of Service' => 'Nutzungsbedingungen',
+                    default => str_replace(
+                        ['{privacyPolicy}', '{termsOfService}'],
+                        [$params['privacyPolicy'] ?? '', $params['termsOfService'] ?? ''],
+                        match ($category) {
+                            'yii3-recaptcha' => match ($id) {
+                                'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.' =>
+                                    'Diese Seite ist durch reCAPTCHA geschützt und es gelten die Google {privacyPolicy} und {termsOfService}.',
+                                default => $id,
+                            },
+                            default => $id,
+                        },
+                    ),
+                };
+            });
+
+        RecaptchaRegistry::configure(
+            new RecaptchaClient(
+                new RecaptchaConfig(siteKeyV3: 'test-key'),
+                $this->createStub(ClientInterface::class),
+                new Psr17Factory(),
+                new Psr17Factory(),
+            ),
+            translator: $translator,
+        );
+
+        $html = RecaptchaV3::widget()
+            ->withBadge(RecaptchaV3Badge::Hidden)
+            ->render();
+
+        $this->assertStringContainsString('Datenschutzerklärung', $html);
+        $this->assertStringContainsString('Nutzungsbedingungen', $html);
+        $this->assertStringContainsString('reCAPTCHA geschützt', $html);
+        $this->assertStringNotContainsString('Privacy Policy', $html);
+    }
+
     public function testRenderUsesSiteKeyFromRegistry(): void
     {
         RecaptchaRegistry::configure(
@@ -124,6 +180,7 @@ final class RecaptchaV3WidgetTest extends TestCase
                 new Psr17Factory(),
                 new Psr17Factory(),
             ),
+            translator: null,
         );
     }
 }
