@@ -27,38 +27,34 @@ return [
         ],
     ],
 
-    RecaptchaClient::class => [
-        '__construct()' => [
-            'config' => static fn(ContainerInterface $container) => $container->get(RecaptchaConfig::class),
-            'httpClient' => static fn(ContainerInterface $container) => $container->get(ClientInterface::class),
-            'requestFactory' => static fn(ContainerInterface $container) => $container->get(RequestFactoryInterface::class),
-            'streamFactory' => static fn(ContainerInterface $container) => $container->get(StreamFactoryInterface::class),
-        ],
-    ],
+    RecaptchaClient::class => static function (ContainerInterface $container): RecaptchaClient {
+        return new RecaptchaClient(
+            config: $container->get(RecaptchaConfig::class),
+            httpClient: $container->get(ClientInterface::class),
+            requestFactory: $container->get(RequestFactoryInterface::class),
+            streamFactory: $container->get(StreamFactoryInterface::class),
+        );
+    },
 
-    RecaptchaV2RuleHandler::class => [
-        '__construct()' => [
-            'client' => static fn(ContainerInterface $container) => $container->has(RecaptchaClient::class)
-                ? $container->get(RecaptchaClient::class)
-                : null,
-            'requestProvider' => static fn(ContainerInterface $container) => $container->has(RequestProviderInterface::class)
+    RecaptchaV2RuleHandler::class => static function (ContainerInterface $container) use ($params): RecaptchaV2RuleHandler {
+        return new RecaptchaV2RuleHandler(
+            client: $container->has(RecaptchaClient::class) ? $container->get(RecaptchaClient::class) : null,
+            requestProvider: $container->has(RequestProviderInterface::class)
                 ? $container->get(RequestProviderInterface::class)
                 : null,
-            'translationCategory' => $params['yiirocks/recaptcha']['translation.category'],
-        ],
-    ],
+            translationCategory: $params['yiirocks/recaptcha']['translation.category'],
+        );
+    },
 
-    RecaptchaV3RuleHandler::class => [
-        '__construct()' => [
-            'client' => static fn(ContainerInterface $container) => $container->has(RecaptchaClient::class)
-                ? $container->get(RecaptchaClient::class)
-                : null,
-            'requestProvider' => static fn(ContainerInterface $container) => $container->has(RequestProviderInterface::class)
+    RecaptchaV3RuleHandler::class => static function (ContainerInterface $container) use ($params): RecaptchaV3RuleHandler {
+        return new RecaptchaV3RuleHandler(
+            client: $container->has(RecaptchaClient::class) ? $container->get(RecaptchaClient::class) : null,
+            requestProvider: $container->has(RequestProviderInterface::class)
                 ? $container->get(RequestProviderInterface::class)
                 : null,
-            'translationCategory' => $params['yiirocks/recaptcha']['translation.category'],
-        ],
-    ],
+            translationCategory: $params['yiirocks/recaptcha']['translation.category'],
+        );
+    },
 
     'yii3-recaptcha.categorySource' => [
         'definition' => static function () use ($params): CategorySource {
