@@ -10,6 +10,8 @@ use Yiisoft\Validator\Result;
 use Yiisoft\Validator\RuleHandlerInterface;
 use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\ValidationContext;
+use YiiRocks\Recaptcha\Exception\InvalidRuleException;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 
 final class RecaptchaV3RuleHandler implements RuleHandlerInterface
 {
@@ -23,27 +25,30 @@ final class RecaptchaV3RuleHandler implements RuleHandlerInterface
     public function validate(mixed $value, RuleInterface $rule, ValidationContext $context): Result
     {
         if (!$rule instanceof RecaptchaV3Rule) {
-            throw new \RuntimeException(sprintf(
-                'Expected %s, got %s.',
-                RecaptchaV3Rule::class,
-                $rule::class,
-            ));
+            throw new InvalidRuleException(RecaptchaV3Rule::class, $rule::class);
         }
 
         $result = new Result();
 
         if (!is_string($value) || $value === '') {
-            return $result->addError($this->translate($rule->getMessage()));
+            $result->addError($this->translate($rule->getMessage()));
+        } else {
+            $this->verifyToken($value, $rule, $result);
         }
 
+        return $result;
+    }
+
+    private function verifyToken(string $value, RecaptchaV3Rule $rule, Result $result): void
+    {
         $clientIp = null;
         if ($rule->getSendRemoteIp()) {
-            $clientIp = RecaptchaRegistry::resolveClientIp($this->requestProvider);
+            $clientIp = $this->resolveClientIp();
         }
 
         $client = $this->client ?? RecaptchaRegistry::client();
         if ($client === null) {
-            throw new \RuntimeException('RecaptchaClient is not configured.');
+            throw new MissingClientException();
         }
 
         $verificationResult = $rule->getSecret() !== null
@@ -51,24 +56,20 @@ final class RecaptchaV3RuleHandler implements RuleHandlerInterface
             : $client->verifyV3($value, $clientIp);
 
         if (!$verificationResult->success) {
-            return $result->addError(
+            $result->addError(
                 $this->translate($rule->getMessage()),
                 ['errorCodes' => implode(', ', $verificationResult->errorCodes)],
             );
-        }
-
-        if ($verificationResult->score === null || $verificationResult->score < $rule->getThreshold()) {
-            return $result->addError(
+        } elseif ($verificationResult->score === null || $verificationResult->score < $rule->getThreshold()) {
+            $result->addError(
                 $this->translate($rule->getScoreTooLowMessage()),
                 [
                     'score' => (string) ($verificationResult->score ?? 0.0),
                     'threshold' => (string) $rule->getThreshold(),
                 ],
             );
-        }
-
-        if ($rule->getAction() !== null && $verificationResult->action !== $rule->getAction()) {
-            return $result->addError(
+        } elseif ($rule->getAction() !== null && $verificationResult->action !== $rule->getAction()) {
+            $result->addError(
                 $this->translate($rule->getActionMismatchMessage()),
                 [
                     'expected' => $rule->getAction(),
@@ -76,8 +77,11 @@ final class RecaptchaV3RuleHandler implements RuleHandlerInterface
                 ],
             );
         }
+    }
 
-        return $result;
+    private function resolveClientIp(): ?string
+    {
+        return RecaptchaRegistry::resolveClientIp($this->requestProvider);
     }
 
     private function translate(string $message): string

@@ -16,7 +16,7 @@ use Yiisoft\Validator\ValidationContext;
 
 final class RecaptchaV2RuleHandlerTest extends TestCase
 {
-    private RecaptchaV2RuleHandler $handler;
+    private RecaptchaV2RuleHandler $_handler;
 
     protected function setUp(): void
     {
@@ -34,13 +34,13 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
 
         RecaptchaRegistry::configure($client);
 
-        $this->handler = new RecaptchaV2RuleHandler();
+        $this->_handler = new RecaptchaV2RuleHandler();
     }
 
     public function testValidateSuccess(): void
     {
         $rule = new RecaptchaV2Rule();
-        $result = $this->handler->validate('valid-token', $rule, new ValidationContext());
+        $result = $this->_handler->validate('valid-token', $rule, new ValidationContext());
 
         $this->assertTrue($result->isValid());
     }
@@ -48,7 +48,7 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
     public function testValidateEmptyValue(): void
     {
         $rule = new RecaptchaV2Rule();
-        $result = $this->handler->validate('', $rule, new ValidationContext());
+        $result = $this->_handler->validate('', $rule, new ValidationContext());
 
         $this->assertFalse($result->isValid());
     }
@@ -56,7 +56,7 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
     public function testValidateNonStringValue(): void
     {
         $rule = new RecaptchaV2Rule();
-        $result = $this->handler->validate(null, $rule, new ValidationContext());
+        $result = $this->_handler->validate(null, $rule, new ValidationContext());
 
         $this->assertFalse($result->isValid());
     }

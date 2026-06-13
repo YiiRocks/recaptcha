@@ -11,5 +11,10 @@ return [
         'verifyUrl' => 'https://www.google.com/recaptcha/api/siteverify',
         'sendRemoteIp' => false,
         'translation.category' => 'yii3-recaptcha',
+        'container' => [
+            'useContainer' => true,
+            'tag' => 'div',
+            'attributes' => ['class' => 'mb-3'],
+        ],
     ],
 ];

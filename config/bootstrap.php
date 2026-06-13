@@ -7,13 +7,17 @@ namespace YiiRocks\Recaptcha;
 use Psr\Container\ContainerInterface;
 use Yiisoft\RequestProvider\RequestProviderInterface;
 use Yiisoft\Translator\TranslatorInterface;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 
 return [
-    static function (ContainerInterface $container): void {
+    static function (ContainerInterface $container) use ($params): void {
+        RecaptchaRegistry::setContainerDefaults(
+            $params['yiirocks/recaptcha']['container'] ?? [],
+        );
         RecaptchaRegistry::configure(
             client: $container->has(RecaptchaClient::class)
                 ? $container->get(RecaptchaClient::class)
-                : throw new \RuntimeException('RecaptchaClient must be registered in DI.'),
+                : throw new MissingClientException('RecaptchaClient must be registered in DI.'),
             requestProvider: $container->has(RequestProviderInterface::class)
                 ? $container->get(RequestProviderInterface::class)
                 : null,

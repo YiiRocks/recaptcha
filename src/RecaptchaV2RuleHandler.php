@@ -10,6 +10,8 @@ use Yiisoft\Validator\Result;
 use Yiisoft\Validator\RuleHandlerInterface;
 use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\ValidationContext;
+use YiiRocks\Recaptcha\Exception\InvalidRuleException;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 
 final class RecaptchaV2RuleHandler implements RuleHandlerInterface
 {
@@ -23,27 +25,30 @@ final class RecaptchaV2RuleHandler implements RuleHandlerInterface
     public function validate(mixed $value, RuleInterface $rule, ValidationContext $context): Result
     {
         if (!$rule instanceof RecaptchaV2Rule) {
-            throw new \RuntimeException(sprintf(
-                'Expected %s, got %s.',
-                RecaptchaV2Rule::class,
-                $rule::class,
-            ));
+            throw new InvalidRuleException(RecaptchaV2Rule::class, $rule::class);
         }
 
         $result = new Result();
 
         if (!is_string($value) || $value === '') {
-            return $result->addError($this->translate($rule->getMessage()));
+            $result->addError($this->translate($rule->getMessage()));
+        } else {
+            $this->verifyToken($value, $rule, $result);
         }
 
+        return $result;
+    }
+
+    private function verifyToken(string $value, RecaptchaV2Rule $rule, Result $result): void
+    {
         $clientIp = null;
         if ($rule->getSendRemoteIp()) {
-            $clientIp = RecaptchaRegistry::resolveClientIp($this->requestProvider);
+            $clientIp = $this->resolveClientIp();
         }
 
         $client = $this->client ?? RecaptchaRegistry::client();
         if ($client === null) {
-            throw new \RuntimeException('RecaptchaClient is not configured.');
+            throw new MissingClientException();
         }
 
         $verificationResult = $rule->getSecret() !== null
@@ -56,8 +61,11 @@ final class RecaptchaV2RuleHandler implements RuleHandlerInterface
                 ['errorCodes' => implode(', ', $verificationResult->errorCodes)],
             );
         }
+    }
 
-        return $result;
+    private function resolveClientIp(): ?string
+    {
+        return RecaptchaRegistry::resolveClientIp($this->requestProvider);
     }
 
     private function translate(string $message): string

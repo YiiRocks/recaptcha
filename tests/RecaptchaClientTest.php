@@ -15,8 +15,8 @@ final class RecaptchaClientTest extends TestCase
 {
     public function testVerifySuccess(): void
     {
-        $client = $this->createMockClient(['success' => true]);
-        $recaptchaClient = $this->createClient($client);
+        $client = $this->_createMockClient(['success' => true]);
+        $recaptchaClient = $this->_createClient($client);
 
         $result = $recaptchaClient->verify('valid-token');
 
@@ -26,11 +26,11 @@ final class RecaptchaClientTest extends TestCase
 
     public function testVerifyFailure(): void
     {
-        $client = $this->createMockClient([
+        $client = $this->_createMockClient([
             'success' => false,
             'error-codes' => ['invalid-input-response'],
         ]);
-        $recaptchaClient = $this->createClient($client);
+        $recaptchaClient = $this->_createClient($client);
 
         $result = $recaptchaClient->verify('invalid-token');
 
@@ -40,12 +40,12 @@ final class RecaptchaClientTest extends TestCase
 
     public function testVerifyV3WithScoreAndAction(): void
     {
-        $client = $this->createMockClient([
+        $client = $this->_createMockClient([
             'success' => true,
             'score' => 0.9,
             'action' => 'login',
         ]);
-        $recaptchaClient = $this->createClient($client);
+        $recaptchaClient = $this->_createClient($client);
 
         $result = $recaptchaClient->verifyV3('valid-token');
 
@@ -56,8 +56,8 @@ final class RecaptchaClientTest extends TestCase
 
     public function testVerifyWithSecret(): void
     {
-        $client = $this->createMockClient(['success' => true]);
-        $recaptchaClient = $this->createClient($client);
+        $client = $this->_createMockClient(['success' => true]);
+        $recaptchaClient = $this->_createClient($client);
 
         $result = $recaptchaClient->verifyWithSecret('token', 'custom-secret');
 
@@ -71,7 +71,7 @@ final class RecaptchaClientTest extends TestCase
             implements \Psr\Http\Client\ClientExceptionInterface {};
         $client->method('sendRequest')->willThrowException($exception);
 
-        $recaptchaClient = $this->createClient($client);
+        $recaptchaClient = $this->_createClient($client);
 
         $result = $recaptchaClient->verify('token');
 
@@ -79,7 +79,7 @@ final class RecaptchaClientTest extends TestCase
         $this->assertContains('http-error', $result->errorCodes);
     }
 
-    private function createMockClient(array $responseData): ClientInterface
+    private function _createMockClient(array $responseData): ClientInterface
     {
         $factory = new Psr17Factory();
         $body = $factory->createStream(json_encode($responseData));
@@ -92,7 +92,7 @@ final class RecaptchaClientTest extends TestCase
         return $client;
     }
 
-    private function createClient(ClientInterface $client): RecaptchaClient
+    private function _createClient(ClientInterface $client): RecaptchaClient
     {
         $factory = new Psr17Factory();
         $config = new RecaptchaConfig(

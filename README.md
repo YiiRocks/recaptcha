@@ -6,7 +6,7 @@
 [![GitHub License](https://img.shields.io/github/license/yiirocks/recaptcha.svg)](https://github.com/yiirocks/recaptcha/blob/master/LICENSE)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/YiiRocks/recaptcha/build.yml?branch=master)](https://github.com/YiiRocks/recaptcha/actions)
 
-Google reCAPTCHA v2 and v3 widget and server-side validator for Yii3.
+Google reCAPTCHA v2 and v3 field + server-side validator for Yii3.
 
 ## Requirements
 
@@ -64,7 +64,7 @@ them in your `config/params.php` as needed (the config-plugin merges them).
 | `sendRemoteIp` | `false` | Send the user's IP to Google for abuse analysis |
 | `translation.category` | `yii3-recaptcha` | Translation category used by message sources |
 
-> **Tip:** Once your site keys are set, widgets will pull them from the
+> **Tip:** Once your site keys are set, fields will pull them from the
 > registry automatically — no need to call `withSiteKey()` in your view code.
 
 ### DI Configuration
@@ -77,38 +77,29 @@ automatically:
   client, request provider, and translator
 - The translation category source is registered with the `translation.categorySource` tag
 - The bootstrap callback populates `RecaptchaRegistry` with the client, request
-  provider, and translator. This means widgets and handlers work out of the box
+  provider, and translator. This means fields and handlers work out of the box
   — no explicit `withSiteKey()` needed.
 
 ## Usage
 
+All fields are rendered with a form model via the `::field()` static method —
+the standard Yii3 form field pattern. Validation errors are shown automatically.
+
 ### reCAPTCHA v2
 
-When the config is set up (via env vars or `params.php`), the site key is
-pulled from the registry automatically. You can render the widget without
-any `withSiteKey()` call:
-
 ```php
-use YiiRocks\Recaptcha\RecaptchaV2;
+use Yiisoft\FormModel\FormModel;
+use YiiRocks\Recaptcha\RecaptchaV2Field;
 use YiiRocks\Recaptcha\RecaptchaV2Theme;
 use YiiRocks\Recaptcha\RecaptchaV2Size;
 use YiiRocks\Recaptcha\RecaptchaV2Type;
 
-echo RecaptchaV2::widget()->render();  // site key from config
-```
-
-To use an explicit site key (e.g. a different key for a specific form):
-
-```php
-echo RecaptchaV2::widget()
-    ->withSiteKey($siteKey)
+echo RecaptchaV2Field::field($form, 'captcha')
     ->withTheme(RecaptchaV2Theme::Dark)
     ->withSize(RecaptchaV2Size::Compact)
     ->withType(RecaptchaV2Type::Audio)
     ->withId('my-captcha')
     ->withCallback('onSuccess')
-    ->withExpiredCallback('onExpired')
-    ->withErrorCallback('onError')
     ->render();
 ```
 
@@ -128,23 +119,15 @@ Available options:
 
 ### reCAPTCHA v3
 
-Site key is pulled from the registry automatically when the config is set up.
 The reCAPTCHA token is fetched on form submit (not on page load), preventing
 unexpected challenge popups:
 
 ```php
-use YiiRocks\Recaptcha\RecaptchaV3;
+use Yiisoft\FormModel\FormModel;
+use YiiRocks\Recaptcha\RecaptchaV3Field;
 use YiiRocks\Recaptcha\RecaptchaV3Badge;
 
-echo RecaptchaV3::widget()->render();  // site key from config
-```
-
-The form is auto-resolved via `closest("form")`. If the hidden input is outside
-the form, pass `withFormId()` to target a specific form element:
-
-```php
-echo RecaptchaV3::widget()
-    ->withSiteKey($siteKey)
+echo RecaptchaV3Field::field($form, 'captcha')
     ->withAction('login')
     ->withFormId('login-form')
     ->withBadge(RecaptchaV3Badge::Hidden)
@@ -157,12 +140,22 @@ Available options:
 |---|---|---|
 | `withSiteKey(string)` | from config | Google reCAPTCHA v3 site key |
 | `withAction(string)` | `'submit'` | Action name sent to Google |
-| `withFieldName(string)` | `'g-recaptcha-response'` | Hidden input name attribute |
-| `withFieldId(string)` | `'{fieldName}-{uniqid}'` | Hidden input ID attribute |
-| `withFormId(string)` | — | Explicit form ID (auto-resolved if omitted) |
+| `withFormId(string)` | — | Explicit form ID (auto-resolved via `closest("form")` if omitted) |
 | `withBadge(RecaptchaV3Badge)` | `BottomRight` | `BottomRight`, `BottomLeft`, or `Hidden` |
 | `withJsApiUrl(string)` | Google CDN | Custom JS API URL |
 | `withTranslator(?TranslatorInterface)` | from registry | Translator for the hidden badge legal notice |
+| `withExecuteTimeout(?int)` | `15000` (ms) | Fallback form submission timeout (null = disabled) |
+
+**Inherited from `InputField`:**
+- `->name(string)` — override the hidden input name (default: auto-derived from form model as `FormName[attribute]`)
+- `->inputId(?string)` — override the hidden input ID (default: auto-generated unique ID)
+
+**Container (inherited from `BaseField`):**
+- `->containerTag(string)` — wrapper tag (default: `div`)
+- `->containerClass(string ...)` — wrapper CSS class(es) (default: `mb-3`)
+- `->useContainer(bool)` — enable/disable wrapper (default: `true`)
+- `->containerAttributes(array)` — set all wrapper attributes
+- `->addContainerAttributes(array)` — merge additional wrapper attributes
 
 > **Hidden badge:** When `Badge::Hidden` is selected, the legal notice text
 > ("This site is protected by reCAPTCHA…") is displayed automatically and

@@ -16,7 +16,7 @@ use Yiisoft\Validator\ValidationContext;
 
 final class RecaptchaV3RuleHandlerTest extends TestCase
 {
-    private RecaptchaV3RuleHandler $handler;
+    private RecaptchaV3RuleHandler $_handler;
 
     protected function setUp(): void
     {
@@ -36,13 +36,13 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
         RecaptchaRegistry::configure($client);
 
-        $this->handler = new RecaptchaV3RuleHandler();
+        $this->_handler = new RecaptchaV3RuleHandler();
     }
 
     public function testValidateSuccess(): void
     {
         $rule = new RecaptchaV3Rule();
-        $result = $this->handler->validate('valid-token', $rule, new ValidationContext());
+        $result = $this->_handler->validate('valid-token', $rule, new ValidationContext());
 
         $this->assertTrue($result->isValid());
     }
@@ -63,9 +63,9 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
         $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
         RecaptchaRegistry::configure($client);
 
-        $handler = new RecaptchaV3RuleHandler();
+        $localHandler = new RecaptchaV3RuleHandler();
         $rule = new RecaptchaV3Rule(threshold: 0.5);
-        $result = $handler->validate('low-score-token', $rule, new ValidationContext());
+        $result = $localHandler->validate('low-score-token', $rule, new ValidationContext());
 
         $this->assertFalse($result->isValid());
     }
@@ -86,9 +86,9 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
         $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
         RecaptchaRegistry::configure($client);
 
-        $handler = new RecaptchaV3RuleHandler();
+        $localHandler = new RecaptchaV3RuleHandler();
         $rule = new RecaptchaV3Rule(action: 'login');
-        $result = $handler->validate('action-mismatch-token', $rule, new ValidationContext());
+        $result = $localHandler->validate('action-mismatch-token', $rule, new ValidationContext());
 
         $this->assertFalse($result->isValid());
     }
@@ -96,7 +96,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
     public function testValidateEmptyValue(): void
     {
         $rule = new RecaptchaV3Rule();
-        $result = $this->handler->validate('', $rule, new ValidationContext());
+        $result = $this->_handler->validate('', $rule, new ValidationContext());
 
         $this->assertFalse($result->isValid());
     }
@@ -116,9 +116,9 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
         $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
         RecaptchaRegistry::configure($client);
 
-        $handler = new RecaptchaV3RuleHandler();
+        $localHandler = new RecaptchaV3RuleHandler();
         $rule = new RecaptchaV3Rule();
-        $result = $handler->validate('bad-token', $rule, new ValidationContext());
+        $result = $localHandler->validate('bad-token', $rule, new ValidationContext());
 
         $this->assertFalse($result->isValid());
     }
