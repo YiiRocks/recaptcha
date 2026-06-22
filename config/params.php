@@ -10,7 +10,7 @@ return [
         'secretV3' => $_ENV['RECAPTCHA_SECRET_V3'] ?? '',
         'verifyUrl' => 'https://www.google.com/recaptcha/api/siteverify',
         'sendRemoteIp' => false,
-        'translation.category' => 'yii3-recaptcha',
+        'translation.category' => 'recaptcha',
         'container' => [
             'useContainer' => true,
             'tag' => 'div',

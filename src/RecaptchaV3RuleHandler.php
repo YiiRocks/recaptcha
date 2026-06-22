@@ -19,7 +19,7 @@ final class RecaptchaV3RuleHandler implements RuleHandlerInterface
         private ?RecaptchaClient $client = null,
         private ?RequestProviderInterface $requestProvider = null,
         private ?TranslatorInterface $translator = null,
-        private string $translationCategory = 'yii3-recaptcha',
+        private string $translationCategory = 'recaptcha',
     ) {}
 
     public function validate(mixed $value, RuleInterface $rule, ValidationContext $context): Result

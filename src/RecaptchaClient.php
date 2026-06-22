@@ -56,15 +56,19 @@ final readonly class RecaptchaClient
 
         try {
             $response = $this->httpClient->sendRequest($request);
+            /** @var array $data */
             $data = json_decode($response->getBody()->__toString(), true);
+
+            /** @var array<int, string> $errorCodes */
+            $errorCodes = (array) ($data['error-codes'] ?? []);
 
             return new VerificationResult(
                 success: (bool) ($data['success'] ?? false),
-                errorCodes: (array) ($data['error-codes'] ?? []),
+                errorCodes: $errorCodes,
                 score: isset($data['score']) ? (float) $data['score'] : null,
-                action: $data['action'] ?? null,
-                hostname: $data['hostname'] ?? null,
-                challengeTs: $data['challenge_ts'] ?? null,
+                action: isset($data['action']) ? (string) $data['action'] : null,
+                hostname: isset($data['hostname']) ? (string) $data['hostname'] : null,
+                challengeTs: isset($data['challenge_ts']) ? (string) $data['challenge_ts'] : null,
             );
         } catch (ClientExceptionInterface) {
             return new VerificationResult(

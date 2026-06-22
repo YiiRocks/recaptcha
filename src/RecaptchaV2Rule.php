@@ -21,6 +21,9 @@ final class RecaptchaV2Rule implements RuleInterface, SkipOnEmptyInterface, Skip
     use SkipOnErrorTrait;
     use WhenTrait;
 
+    /**
+     * @param bool|callable(mixed, bool):bool|null $skipOnEmpty
+     */
     public function __construct(
         private readonly string $message = 'The CAPTCHA verification failed.',
         private readonly ?string $secret = null,

@@ -62,7 +62,7 @@ them in your `config/params.php` as needed (the config-plugin merges them).
 | `secretV3` | `''` (or `$_ENV`) | reCAPTCHA v3 secret |
 | `verifyUrl` | `https://www.google.com/recaptcha/api/siteverify` | Google verification endpoint |
 | `sendRemoteIp` | `false` | Send the user's IP to Google for abuse analysis |
-| `translation.category` | `yii3-recaptcha` | Translation category used by message sources |
+| `translation.category` | `recaptcha` | Translation category used by message sources |
 
 > **Tip:** Once your site keys are set, fields will pull them from the
 > registry automatically — no need to call `withSiteKey()` in your view code.

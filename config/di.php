@@ -56,7 +56,7 @@ return [
         );
     },
 
-    'yii3-recaptcha.categorySource' => [
+    'recaptcha.categorySource' => [
         'definition' => static function () use ($params): CategorySource {
             $reader = class_exists(MessageSource::class)
                 ? new MessageSource(dirname(__DIR__) . '/messages')

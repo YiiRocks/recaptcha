@@ -63,6 +63,9 @@ final class RecaptchaRegistry
         return self::$containerTag;
     }
 
+    /**
+     * @return array<string, string>|null
+     */
     public static function containerAttributes(): ?array
     {
         return self::$containerAttributes;
@@ -77,10 +80,12 @@ final class RecaptchaRegistry
         }
 
         try {
-            $request = $provider->getRequest();
+            $request = $provider->get();
             $serverParams = $request->getServerParams();
+            /** @var mixed $remoteAddr */
+            $remoteAddr = $serverParams['REMOTE_ADDR'] ?? null;
 
-            return $serverParams['REMOTE_ADDR'] ?? null;
+            return is_string($remoteAddr) ? $remoteAddr : null;
         } catch (RequestNotSetException) {
             return null;
         }

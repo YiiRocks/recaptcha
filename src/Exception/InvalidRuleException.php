@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha\Exception;
 
-class InvalidRuleException extends \RuntimeException
+final class InvalidRuleException extends \RuntimeException
 {
     public function __construct(string $expected, string $actual)
     {

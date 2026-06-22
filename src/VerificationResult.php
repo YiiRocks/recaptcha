@@ -6,6 +6,9 @@ namespace YiiRocks\Recaptcha;
 
 final readonly class VerificationResult
 {
+    /**
+     * @param array<int, string> $errorCodes
+     */
     public function __construct(
         public bool $success,
         public array $errorCodes = [],

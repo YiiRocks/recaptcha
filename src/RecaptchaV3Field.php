@@ -17,15 +17,12 @@ final class RecaptchaV3Field extends InputField
     private const PRIVACY_URL = 'https://policies.google.com/privacy';
     private const TERMS_URL = 'https://policies.google.com/terms';
 
-    private const ANCHOR_OPEN = '<a href="';
-    private const ANCHOR_CLOSE = '</a>';
-
     private const PRIVACY_POLICY_TEXT = 'Privacy Policy';
     private const TERMS_OF_SERVICE_TEXT = 'Terms of Service';
 
     private const DEFAULT_LEGAL_NOTICE = 'This site is protected by reCAPTCHA and the Google '
-        . self::ANCHOR_OPEN . self::PRIVACY_URL . '">' . self::PRIVACY_POLICY_TEXT . self::ANCHOR_CLOSE . ' and '
-        . self::ANCHOR_OPEN . self::TERMS_URL . '">' . self::TERMS_OF_SERVICE_TEXT . self::ANCHOR_CLOSE . ' apply.';
+        . '<a href="' . self::PRIVACY_URL . '">' . self::PRIVACY_POLICY_TEXT . '</a> and '
+        . '<a href="' . self::TERMS_URL . '">' . self::TERMS_OF_SERVICE_TEXT . '</a> apply.';
 
     private const LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
 
@@ -113,7 +110,7 @@ final class RecaptchaV3Field extends InputField
         }
 
         $tag = RecaptchaRegistry::containerTag();
-        if ($tag !== null && $this->containerTag === 'div') {
+        if ($tag !== null && $tag !== '' && $this->containerTag === 'div') {
             $this->containerTag = $tag;
         }
 
@@ -133,21 +130,21 @@ final class RecaptchaV3Field extends InputField
 
     protected function generateInput(): string
     {
+        /** @var string $name */
         $name = $this->getName();
         $fieldId = $this->inputId ?? ($name !== '' ? $name : 'g-recaptcha') . '-' . uniqid();
-        $apiUrl = $this->jsApiUrl . '?render=' . $this->siteKey;
+        $siteKey = $this->siteKey ?? throw new Exception\MissingSiteKeyException();
+        $apiUrl = $this->jsApiUrl . '?render=' . $siteKey;
 
         $html = '';
 
         if ($this->badge === RecaptchaV3Badge::Hidden) {
-            $html .= '<div style="display:none;">';
+            $html .= Html::div()->addStyle(['display' => 'none'])->open();
         }
 
-        $html .= '<script src="' . $apiUrl . '"></script>';
-        $html .= "\n";
-
-        $html .= '<input type="hidden" id="' . $fieldId . '" name="' . $name . '" value="">';
-        $html .= "\n";
+        $html .= Html::script()->src($apiUrl)->render();
+        /** @var non-empty-string $fieldId */
+        $html .= Html::hiddenInput($name)->id($fieldId)->render();
 
         $jsOptions = json_encode(
             [
@@ -191,26 +188,22 @@ final class RecaptchaV3Field extends InputField
         $html .= '</script>';
 
         if ($this->badge === RecaptchaV3Badge::Hidden) {
-            $html .= '</div>';
+            $html .= Html::div()->close();
         }
 
         if ($this->badge === RecaptchaV3Badge::Hidden) {
-            $privacyLink = self::ANCHOR_OPEN . self::PRIVACY_URL . '">'
-                . $this->translate(self::PRIVACY_POLICY_TEXT) . self::ANCHOR_CLOSE;
-            $termsLink = self::ANCHOR_OPEN . self::TERMS_URL . '">'
-                . $this->translate(self::TERMS_OF_SERVICE_TEXT) . self::ANCHOR_CLOSE;
+            $privacyLink = Html::a($this->translate(self::PRIVACY_POLICY_TEXT), self::PRIVACY_URL);
+            $termsLink = Html::a($this->translate(self::TERMS_OF_SERVICE_TEXT), self::TERMS_URL);
 
             $notice = $this->translator !== null
                 ? $this->translator->translate(
                     self::LEGAL_NOTICE_MESSAGE_ID,
                     ['privacyPolicy' => $privacyLink, 'termsOfService' => $termsLink],
-                    'yii3-recaptcha',
+                    'recaptcha',
                 )
                 : self::DEFAULT_LEGAL_NOTICE;
 
-            $html .= "\n" . '<div>'
-                . $notice
-                . '</div>';
+            $html .= Html::div($notice)->encode(false)->render();
         }
 
         return $html;
@@ -219,7 +212,7 @@ final class RecaptchaV3Field extends InputField
     private function translate(string $message): string
     {
         if ($this->translator !== null) {
-            return $this->translator->translate($message, [], 'yii3-recaptcha');
+            return $this->translator->translate($message, [], 'recaptcha');
         }
 
         return $message;

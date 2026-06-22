@@ -88,7 +88,7 @@ final class RecaptchaV3FieldTest extends TestCase
             ->withBadge(RecaptchaV3Badge::Hidden)
             ->render();
 
-        $this->assertStringContainsString('style="display:none;"', $html);
+        $this->assertStringContainsString('style="display: none;"', $html);
         $this->assertStringContainsString('Privacy Policy', $html);
         $this->assertStringContainsString('Terms of Service', $html);
     }
@@ -156,7 +156,7 @@ final class RecaptchaV3FieldTest extends TestCase
                         ['{privacyPolicy}', '{termsOfService}'],
                         [$params['privacyPolicy'] ?? '', $params['termsOfService'] ?? ''],
                         match ($category) {
-                            'yii3-recaptcha' => match ($id) {
+                            'recaptcha' => match ($id) {
                                 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.' =>
                                     'Diese Seite ist durch reCAPTCHA geschützt und es gelten die Google {privacyPolicy} und {termsOfService}.',
                                 default => $id,

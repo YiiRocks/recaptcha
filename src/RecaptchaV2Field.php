@@ -111,7 +111,7 @@ final class RecaptchaV2Field extends InputField
         }
 
         $tag = RecaptchaRegistry::containerTag();
-        if ($tag !== null && $this->containerTag === 'div') {
+        if ($tag !== null && $tag !== '' && $this->containerTag === 'div') {
             $this->containerTag = $tag;
         }
 
@@ -133,10 +133,12 @@ final class RecaptchaV2Field extends InputField
     {
         $elementId = $this->id !== '' ? $this->id : 'g-recaptcha-' . uniqid();
 
+        $siteKey = $this->siteKey ?? throw new Exception\MissingSiteKeyException();
+
         $html = '<div'
             . ' id="' . $elementId . '"'
             . ' class="g-recaptcha"'
-            . ' data-sitekey="' . $this->siteKey . '"'
+            . ' data-sitekey="' . $siteKey . '"'
             . ' data-theme="' . $this->theme->value . '"'
             . ' data-type="' . $this->type->value . '"'
             . ' data-size="' . $this->size->value . '"';

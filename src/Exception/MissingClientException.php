@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha\Exception;
 
-class MissingClientException extends \RuntimeException
+final class MissingClientException extends \RuntimeException
 {
     public function __construct(string $message = 'RecaptchaClient is not configured.')
     {
