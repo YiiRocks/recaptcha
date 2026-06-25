@@ -4,14 +4,12 @@ on:
       - 'README.md'
       - '.gitignore'
       - '.gitattributes'
-      - 'psalm.xml'
 
   push:
     paths-ignore:
       - 'README.md'
       - '.gitignore'
       - '.gitattributes'
-      - 'psalm.xml'
 
 name: build
 
@@ -55,3 +53,11 @@ jobs:
 
       - name: Run tests with phpunit.
         run: vendor/bin/phpunit --colors=always
+
+  psalm:
+    uses: yiisoft/actions/.github/workflows/psalm.yml@master
+    with:
+      os: >-
+        ['ubuntu-latest']
+      php: >-
+        ['8.3', '8.4', '8.5']
