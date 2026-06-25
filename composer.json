@@ -43,7 +43,7 @@
         "nyholm/psr7": "@stable",
         "phpunit/phpunit": "@stable",
         "psr/container": "^2.0",
-        "vimeo/psalm": "@stable",
+        "vimeo/psalm": "^6.0",
         "yiisoft/translator-message-php": "^1.1"
     },
     "autoload": {
