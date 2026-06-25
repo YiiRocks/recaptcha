@@ -8,6 +8,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use JsonException;
 
 final readonly class RecaptchaClient
 {
@@ -56,8 +57,21 @@ final readonly class RecaptchaClient
 
         try {
             $response = $this->httpClient->sendRequest($request);
-            /** @var array $data */
-            $data = json_decode($response->getBody()->__toString(), true);
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+                return new VerificationResult(
+                    success: false,
+                    errorCodes: ['http-error'],
+                );
+            }
+
+            /** @var mixed $data */
+            $data = json_decode($response->getBody()->__toString(), true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($data)) {
+                return new VerificationResult(
+                    success: false,
+                    errorCodes: ['http-error'],
+                );
+            }
 
             /** @var array<int, string> $errorCodes */
             $errorCodes = (array) ($data['error-codes'] ?? []);
@@ -70,7 +84,7 @@ final readonly class RecaptchaClient
                 hostname: isset($data['hostname']) ? (string) $data['hostname'] : null,
                 challengeTs: isset($data['challenge_ts']) ? (string) $data['challenge_ts'] : null,
             );
-        } catch (ClientExceptionInterface) {
+        } catch (ClientExceptionInterface|JsonException) {
             return new VerificationResult(
                 success: false,
                 errorCodes: ['http-error'],

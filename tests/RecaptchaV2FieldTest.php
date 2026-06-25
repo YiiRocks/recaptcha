@@ -318,14 +318,6 @@ final class RecaptchaV2FieldTest extends TestCase
 
     protected function tearDown(): void
     {
-        RecaptchaRegistry::setContainerDefaults([]);
-        RecaptchaRegistry::configure(
-            new RecaptchaClient(
-                new RecaptchaConfig(),
-                $this->createStub(ClientInterface::class),
-                new Psr17Factory(),
-                new Psr17Factory(),
-            ),
-        );
+        RecaptchaRegistry::reset();
     }
 }

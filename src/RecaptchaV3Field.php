@@ -25,6 +25,7 @@ final class RecaptchaV3Field extends InputField
         . '<a href="' . self::TERMS_URL . '">' . self::TERMS_OF_SERVICE_TEXT . '</a> apply.';
 
     private const LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
+    private const HIDDEN_BADGE_STYLE = '<style>.grecaptcha-badge{visibility:hidden !important;}</style>';
 
     private ?string $siteKey = null;
     private string $action = '';
@@ -139,6 +140,7 @@ final class RecaptchaV3Field extends InputField
         $html = '';
 
         if ($this->badge === RecaptchaV3Badge::Hidden) {
+            $html .= self::HIDDEN_BADGE_STYLE;
             $html .= Html::div()->addStyle(['display' => 'none'])->open();
         }
 

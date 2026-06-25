@@ -28,6 +28,16 @@ final class RecaptchaRegistry
         self::$translator = $translator;
     }
 
+    public static function reset(): void
+    {
+        self::$client = null;
+        self::$requestProvider = null;
+        self::$translator = null;
+        self::$containerUseContainer = null;
+        self::$containerTag = null;
+        self::$containerAttributes = null;
+    }
+
     public static function client(): ?RecaptchaClient
     {
         return self::$client;
@@ -82,10 +92,13 @@ final class RecaptchaRegistry
         try {
             $request = $provider->get();
             $serverParams = $request->getServerParams();
-            /** @var mixed $remoteAddr */
             $remoteAddr = $serverParams['REMOTE_ADDR'] ?? null;
 
-            return is_string($remoteAddr) ? $remoteAddr : null;
+            if (!is_string($remoteAddr)) {
+                return null;
+            }
+
+            return $remoteAddr;
         } catch (RequestNotSetException) {
             return null;
         }

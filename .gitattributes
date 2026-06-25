@@ -5,5 +5,4 @@
 /.php-cs-fixer.php export-ignore
 /tests export-ignore
 /psalm.xml export-ignore
-/rector.php export-ignore
 /phpunit.xml.dist export-ignore

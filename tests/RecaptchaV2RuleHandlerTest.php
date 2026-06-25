@@ -85,13 +85,6 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
 
     protected function tearDown(): void
     {
-        RecaptchaRegistry::configure(
-            new RecaptchaClient(
-                new RecaptchaConfig(),
-                $this->createStub(ClientInterface::class),
-                new Psr17Factory(),
-                new Psr17Factory(),
-            ),
-        );
+        RecaptchaRegistry::reset();
     }
 }

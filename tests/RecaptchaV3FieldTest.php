@@ -88,6 +88,7 @@ final class RecaptchaV3FieldTest extends TestCase
             ->withBadge(RecaptchaV3Badge::Hidden)
             ->render();
 
+        $this->assertStringContainsString('.grecaptcha-badge{visibility:hidden !important;}', $html);
         $this->assertStringContainsString('style="display: none;"', $html);
         $this->assertStringContainsString('Privacy Policy', $html);
         $this->assertStringContainsString('Terms of Service', $html);
@@ -435,15 +436,6 @@ final class RecaptchaV3FieldTest extends TestCase
 
     protected function tearDown(): void
     {
-        RecaptchaRegistry::setContainerDefaults([]);
-        RecaptchaRegistry::configure(
-            new RecaptchaClient(
-                new RecaptchaConfig(),
-                $this->createStub(ClientInterface::class),
-                new Psr17Factory(),
-                new Psr17Factory(),
-            ),
-            translator: null,
-        );
+        RecaptchaRegistry::reset();
     }
 }

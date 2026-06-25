@@ -79,12 +79,39 @@ final class RecaptchaClientTest extends TestCase
         $this->assertContains('http-error', $result->errorCodes);
     }
 
+    public function testInvalidJsonReturnsFailure(): void
+    {
+        $client = $this->_createMockClientBody('not-json');
+        $recaptchaClient = $this->_createClient($client);
+
+        $result = $recaptchaClient->verify('token');
+
+        $this->assertFalse($result->success);
+        $this->assertContains('http-error', $result->errorCodes);
+    }
+
+    public function testNonSuccessStatusReturnsFailure(): void
+    {
+        $client = $this->_createMockClientBody('{"success":true}', 500);
+        $recaptchaClient = $this->_createClient($client);
+
+        $result = $recaptchaClient->verify('token');
+
+        $this->assertFalse($result->success);
+        $this->assertContains('http-error', $result->errorCodes);
+    }
+
     private function _createMockClient(array $responseData): ClientInterface
     {
-        $factory = new Psr17Factory();
-        $body = $factory->createStream(json_encode($responseData));
+        return $this->_createMockClientBody(json_encode($responseData));
+    }
 
-        $response = new Response(200, [], $body);
+    private function _createMockClientBody(string $bodyContent, int $statusCode = 200): ClientInterface
+    {
+        $factory = new Psr17Factory();
+        $body = $factory->createStream($bodyContent);
+
+        $response = new Response($statusCode, [], $body);
 
         $client = $this->createStub(ClientInterface::class);
         $client->method('sendRequest')->willReturn($response);
