@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha;
 
+use YiiRocks\Recaptcha\Exception\InvalidRuleException;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 use Yiisoft\RequestProvider\RequestProviderInterface;
 use Yiisoft\Translator\TranslatorInterface;
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\RuleHandlerInterface;
 use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\ValidationContext;
-use YiiRocks\Recaptcha\Exception\InvalidRuleException;
-use YiiRocks\Recaptcha\Exception\MissingClientException;
 
 final class RecaptchaV2RuleHandler implements RuleHandlerInterface
 {
@@ -20,8 +20,10 @@ final class RecaptchaV2RuleHandler implements RuleHandlerInterface
         private ?RequestProviderInterface $requestProvider = null,
         private ?TranslatorInterface $translator = null,
         private string $translationCategory = 'recaptcha',
-    ) {}
+    ) {
+    }
 
+    #[\Override]
     public function validate(mixed $value, RuleInterface $rule, ValidationContext $context): Result
     {
         if (!$rule instanceof RecaptchaV2Rule) {
@@ -37,6 +39,24 @@ final class RecaptchaV2RuleHandler implements RuleHandlerInterface
         }
 
         return $result;
+    }
+
+    private function resolveClientIp(): ?string
+    {
+        return RecaptchaRegistry::resolveClientIp($this->requestProvider);
+    }
+
+    private function translate(string $message): string
+    {
+        if ($this->translator === null) {
+            $this->translator = RecaptchaRegistry::translator();
+        }
+
+        if ($this->translator !== null) {
+            return $this->translator->translate($message, [], $this->translationCategory);
+        }
+
+        return $message;
     }
 
     private function verifyToken(string $value, RecaptchaV2Rule $rule, Result $result): void
@@ -61,23 +81,5 @@ final class RecaptchaV2RuleHandler implements RuleHandlerInterface
                 ['errorCodes' => implode(', ', $verificationResult->errorCodes)],
             );
         }
-    }
-
-    private function resolveClientIp(): ?string
-    {
-        return RecaptchaRegistry::resolveClientIp($this->requestProvider);
-    }
-
-    private function translate(string $message): string
-    {
-        if ($this->translator === null) {
-            $this->translator = RecaptchaRegistry::translator();
-        }
-
-        if ($this->translator !== null) {
-            return $this->translator->translate($message, [], $this->translationCategory);
-        }
-
-        return $message;
     }
 }

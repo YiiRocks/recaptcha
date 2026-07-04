@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha;
 
+use JsonException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use JsonException;
 
 final readonly class RecaptchaClient
 {
@@ -17,7 +17,8 @@ final readonly class RecaptchaClient
         private ClientInterface $httpClient,
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
-    ) {}
+    ) {
+    }
 
     public function getConfig(): RecaptchaConfig
     {

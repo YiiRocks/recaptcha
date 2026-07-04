@@ -9,18 +9,6 @@ use YiiRocks\Recaptcha\RecaptchaConfig;
 
 final class RecaptchaConfigTest extends TestCase
 {
-    public function testDefaultValues(): void
-    {
-        $config = new RecaptchaConfig();
-
-        $this->assertSame('', $config->siteKeyV2);
-        $this->assertSame('', $config->secretV2);
-        $this->assertSame('', $config->siteKeyV3);
-        $this->assertSame('', $config->secretV3);
-        $this->assertSame('https://www.google.com/recaptcha/api/siteverify', $config->verifyUrl);
-        $this->assertFalse($config->sendRemoteIp);
-    }
-
     public function testCustomValues(): void
     {
         $config = new RecaptchaConfig(
@@ -40,9 +28,15 @@ final class RecaptchaConfigTest extends TestCase
         $this->assertTrue($config->sendRemoteIp);
     }
 
-    public function testImmutability(): void
+    public function testDefaultValues(): void
     {
-        $config = new RecaptchaConfig(siteKeyV2: 'original');
-        $this->assertSame('original', $config->siteKeyV2);
+        $config = new RecaptchaConfig();
+
+        $this->assertSame('', $config->siteKeyV2);
+        $this->assertSame('', $config->secretV2);
+        $this->assertSame('', $config->siteKeyV3);
+        $this->assertSame('', $config->secretV3);
+        $this->assertSame('https://www.google.com/recaptcha/api/siteverify', $config->verifyUrl);
+        $this->assertFalse($config->sendRemoteIp);
     }
 }

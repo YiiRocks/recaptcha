@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace YiiRocks\Recaptcha;
 
 use Psr\Container\ContainerInterface;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 use Yiisoft\RequestProvider\RequestProviderInterface;
 use Yiisoft\Translator\TranslatorInterface;
-use YiiRocks\Recaptcha\Exception\MissingClientException;
 
 return [
     static function (ContainerInterface $container) use ($params): void {

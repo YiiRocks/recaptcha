@@ -6,10 +6,10 @@ namespace YiiRocks\Recaptcha;
 
 use Attribute;
 use Closure;
-use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\Rule\Trait\SkipOnEmptyTrait;
 use Yiisoft\Validator\Rule\Trait\SkipOnErrorTrait;
 use Yiisoft\Validator\Rule\Trait\WhenTrait;
+use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\SkipOnEmptyInterface;
 use Yiisoft\Validator\SkipOnErrorInterface;
 use Yiisoft\Validator\WhenInterface;
@@ -35,6 +35,7 @@ final class RecaptchaV2Rule implements RuleInterface, SkipOnEmptyInterface, Skip
         $this->skipOnEmpty = $skipOnEmpty;
     }
 
+    #[\Override]
     public function getHandler(): string
     {
         return RecaptchaV2RuleHandler::class;

@@ -5,27 +5,62 @@ declare(strict_types=1);
 namespace YiiRocks\Recaptcha;
 
 use Yiisoft\Form\Field\Base\InputField;
-use Yiisoft\FormModel\FormModelInterface;
 use Yiisoft\FormModel\FormModelInputData;
+use Yiisoft\FormModel\FormModelInterface;
 use Yiisoft\Html\Html;
 
 final class RecaptchaV2Field extends InputField
 {
     private const DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
+    private string $callback = '';
+    private string $errorCallback = '';
+    private string $expiredCallback = '';
+    private string $id = '';
+    private string $jsApiUrl = self::DEFAULT_JS_API_URL;
 
     private ?string $siteKey = null;
-    private string $id = '';
+    private RecaptchaV2Size $size = RecaptchaV2Size::Normal;
     private RecaptchaV2Theme $theme = RecaptchaV2Theme::Light;
     private RecaptchaV2Type $type = RecaptchaV2Type::Image;
-    private RecaptchaV2Size $size = RecaptchaV2Size::Normal;
-    private string $jsApiUrl = self::DEFAULT_JS_API_URL;
-    private string $callback = '';
-    private string $expiredCallback = '';
-    private string $errorCallback = '';
 
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
+    }
+
+    public function withCallback(string $callback): static
+    {
+        $new = clone $this;
+        $new->callback = $callback;
+        return $new;
+    }
+
+    public function withErrorCallback(string $callback): static
+    {
+        $new = clone $this;
+        $new->errorCallback = $callback;
+        return $new;
+    }
+
+    public function withExpiredCallback(string $callback): static
+    {
+        $new = clone $this;
+        $new->expiredCallback = $callback;
+        return $new;
+    }
+
+    public function withId(string $id): static
+    {
+        $new = clone $this;
+        $new->id = $id;
+        return $new;
+    }
+
+    public function withJsApiUrl(string $url): static
+    {
+        $new = clone $this;
+        $new->jsApiUrl = $url;
+        return $new;
     }
 
     public function withSiteKey(string $siteKey): static
@@ -35,10 +70,10 @@ final class RecaptchaV2Field extends InputField
         return $new;
     }
 
-    public function withId(string $id): static
+    public function withSize(RecaptchaV2Size $size): static
     {
         $new = clone $this;
-        $new->id = $id;
+        $new->size = $size;
         return $new;
     }
 
@@ -56,51 +91,16 @@ final class RecaptchaV2Field extends InputField
         return $new;
     }
 
-    public function withSize(RecaptchaV2Size $size): static
-    {
-        $new = clone $this;
-        $new->size = $size;
-        return $new;
-    }
-
-    public function withJsApiUrl(string $url): static
-    {
-        $new = clone $this;
-        $new->jsApiUrl = $url;
-        return $new;
-    }
-
-    public function withCallback(string $callback): static
-    {
-        $new = clone $this;
-        $new->callback = $callback;
-        return $new;
-    }
-
-    public function withExpiredCallback(string $callback): static
-    {
-        $new = clone $this;
-        $new->expiredCallback = $callback;
-        return $new;
-    }
-
-    public function withErrorCallback(string $callback): static
-    {
-        $new = clone $this;
-        $new->errorCallback = $callback;
-        return $new;
-    }
-
+    #[\Override]
     protected function beforeRender(): void
     {
-        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()?->siteKeyV2;
+        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()->siteKeyV2;
         if ($siteKey === null || $siteKey === '') {
             throw new Exception\MissingSiteKeyException();
         }
         $this->siteKey = $siteKey;
 
         $this->template = "{input}\n{error}";
-        $this->hideLabel = true;
         $this->inputContainerTag = null;
         $this->beforeInput = '';
         $this->afterInput = '';
@@ -129,6 +129,7 @@ final class RecaptchaV2Field extends InputField
         }
     }
 
+    #[\Override]
     protected function generateInput(): string
     {
         $elementId = $this->id !== '' ? $this->id : 'g-recaptcha-' . uniqid();

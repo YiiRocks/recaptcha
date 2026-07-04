@@ -6,10 +6,10 @@ namespace YiiRocks\Recaptcha;
 
 use Attribute;
 use Closure;
-use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\Rule\Trait\SkipOnEmptyTrait;
 use Yiisoft\Validator\Rule\Trait\SkipOnErrorTrait;
 use Yiisoft\Validator\Rule\Trait\WhenTrait;
+use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\SkipOnEmptyInterface;
 use Yiisoft\Validator\SkipOnErrorInterface;
 use Yiisoft\Validator\WhenInterface;
@@ -43,6 +43,17 @@ final class RecaptchaV3Rule implements RuleInterface, SkipOnEmptyInterface, Skip
         $this->skipOnEmpty = $skipOnEmpty;
     }
 
+    public function getAction(): ?string
+    {
+        return $this->action;
+    }
+
+    public function getActionMismatchMessage(): string
+    {
+        return $this->actionMismatchMessage;
+    }
+
+    #[\Override]
     public function getHandler(): string
     {
         return RecaptchaV3RuleHandler::class;
@@ -58,28 +69,18 @@ final class RecaptchaV3Rule implements RuleInterface, SkipOnEmptyInterface, Skip
         return $this->scoreTooLowMessage;
     }
 
-    public function getActionMismatchMessage(): string
-    {
-        return $this->actionMismatchMessage;
-    }
-
     public function getSecret(): ?string
     {
         return $this->secret;
     }
 
-    public function getThreshold(): float
-    {
-        return $this->threshold;
-    }
-
-    public function getAction(): ?string
-    {
-        return $this->action;
-    }
-
     public function getSendRemoteIp(): bool
     {
         return $this->sendRemoteIp;
+    }
+
+    public function getThreshold(): float
+    {
+        return $this->threshold;
     }
 }

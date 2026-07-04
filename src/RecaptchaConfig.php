@@ -13,5 +13,6 @@ final readonly class RecaptchaConfig
         public string $secretV3 = '',
         public string $verifyUrl = 'https://www.google.com/recaptcha/api/siteverify',
         public bool $sendRemoteIp = false,
-    ) {}
+    ) {
+    }
 }

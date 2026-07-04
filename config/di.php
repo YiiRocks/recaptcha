@@ -10,10 +10,10 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Yiisoft\RequestProvider\RequestProviderInterface;
 use Yiisoft\Translator\CategorySource;
-use Yiisoft\Translator\Message\Php\MessageSource;
-use Yiisoft\Translator\IntlMessageFormatter;
-use Yiisoft\Translator\SimpleMessageFormatter;
 use Yiisoft\Translator\IdMessageReader;
+use Yiisoft\Translator\IntlMessageFormatter;
+use Yiisoft\Translator\Message\Php\MessageSource;
+use Yiisoft\Translator\SimpleMessageFormatter;
 
 return [
     RecaptchaConfig::class => [

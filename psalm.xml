@@ -14,7 +14,10 @@
         <directory name="src" />
     </projectFiles>
     <issueHandlers>
-        <MissingOverrideAttribute errorLevel="suppress" />
-        <MixedReturnTypeCoercion errorLevel="suppress" />
+        <MixedReturnTypeCoercion>
+            <errorLevel type="suppress">
+                <directory name="vendor" />
+            </errorLevel>
+        </MixedReturnTypeCoercion>
     </issueHandlers>
 </psalm>

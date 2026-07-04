@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace YiiRocks\Recaptcha;
 
 use Yiisoft\Form\Field\Base\InputField;
-use Yiisoft\FormModel\FormModelInterface;
 use Yiisoft\FormModel\FormModelInputData;
+use Yiisoft\FormModel\FormModelInterface;
 use Yiisoft\Html\Html;
 use Yiisoft\Translator\TranslatorInterface;
 
@@ -14,50 +14,36 @@ final class RecaptchaV3Field extends InputField
 {
     private const DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
 
-    private const PRIVACY_URL = 'https://policies.google.com/privacy';
-    private const TERMS_URL = 'https://policies.google.com/terms';
-
-    private const PRIVACY_POLICY_TEXT = 'Privacy Policy';
-    private const TERMS_OF_SERVICE_TEXT = 'Terms of Service';
-
     private const DEFAULT_LEGAL_NOTICE = 'This site is protected by reCAPTCHA and the Google '
         . '<a href="' . self::PRIVACY_URL . '">' . self::PRIVACY_POLICY_TEXT . '</a> and '
         . '<a href="' . self::TERMS_URL . '">' . self::TERMS_OF_SERVICE_TEXT . '</a> apply.';
-
-    private const LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
     private const HIDDEN_BADGE_STYLE = '<style>.grecaptcha-badge{visibility:hidden !important;}</style>';
 
-    private ?string $siteKey = null;
+    private const LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
+
+    private const PRIVACY_POLICY_TEXT = 'Privacy Policy';
+
+    private const PRIVACY_URL = 'https://policies.google.com/privacy';
+    private const TERMS_OF_SERVICE_TEXT = 'Terms of Service';
+    private const TERMS_URL = 'https://policies.google.com/terms';
     private string $action = '';
-    private string $formId = '';
     private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
-    private string $jsApiUrl = self::DEFAULT_JS_API_URL;
-    private ?TranslatorInterface $translator = null;
     private int $executeTimeoutMs = 15000;
+    private string $formId = '';
+    private string $jsApiUrl = self::DEFAULT_JS_API_URL;
+
+    private ?string $siteKey = null;
+    private ?TranslatorInterface $translator = null;
 
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
     }
 
-    public function withSiteKey(string $siteKey): static
-    {
-        $new = clone $this;
-        $new->siteKey = $siteKey;
-        return $new;
-    }
-
     public function withAction(string $action): static
     {
         $new = clone $this;
         $new->action = $action;
-        return $new;
-    }
-
-    public function withFormId(string $id): static
-    {
-        $new = clone $this;
-        $new->formId = $id;
         return $new;
     }
 
@@ -68,10 +54,31 @@ final class RecaptchaV3Field extends InputField
         return $new;
     }
 
+    public function withExecuteTimeout(?int $ms): static
+    {
+        $new = clone $this;
+        $new->executeTimeoutMs = $ms ?? 0;
+        return $new;
+    }
+
+    public function withFormId(string $id): static
+    {
+        $new = clone $this;
+        $new->formId = $id;
+        return $new;
+    }
+
     public function withJsApiUrl(string $url): static
     {
         $new = clone $this;
         $new->jsApiUrl = $url;
+        return $new;
+    }
+
+    public function withSiteKey(string $siteKey): static
+    {
+        $new = clone $this;
+        $new->siteKey = $siteKey;
         return $new;
     }
 
@@ -82,16 +89,10 @@ final class RecaptchaV3Field extends InputField
         return $new;
     }
 
-    public function withExecuteTimeout(?int $ms): static
-    {
-        $new = clone $this;
-        $new->executeTimeoutMs = $ms ?? 0;
-        return $new;
-    }
-
+    #[\Override]
     protected function beforeRender(): void
     {
-        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()?->siteKeyV3;
+        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()->siteKeyV3;
         if ($siteKey === null || $siteKey === '') {
             throw new Exception\MissingSiteKeyException();
         }
@@ -100,7 +101,6 @@ final class RecaptchaV3Field extends InputField
         $this->translator ??= RecaptchaRegistry::translator();
 
         $this->template = "{input}\n{error}";
-        $this->hideLabel = true;
         $this->inputContainerTag = null;
         $this->beforeInput = '';
         $this->afterInput = '';
@@ -129,6 +129,7 @@ final class RecaptchaV3Field extends InputField
         }
     }
 
+    #[\Override]
     protected function generateInput(): string
     {
         /** @var string $name */
@@ -140,7 +141,7 @@ final class RecaptchaV3Field extends InputField
         $html = '';
 
         if ($this->badge === RecaptchaV3Badge::Hidden) {
-            $html .= self::HIDDEN_BADGE_STYLE;
+            $html = self::HIDDEN_BADGE_STYLE;
             $html .= Html::div()->addStyle(['display' => 'none'])->open();
         }
 

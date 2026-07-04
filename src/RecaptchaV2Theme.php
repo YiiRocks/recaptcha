@@ -6,6 +6,6 @@ namespace YiiRocks\Recaptcha;
 
 enum RecaptchaV2Theme: string
 {
-    case Light = 'light';
     case Dark = 'dark';
+    case Light = 'light';
 }

@@ -6,7 +6,7 @@ namespace YiiRocks\Recaptcha;
 
 enum RecaptchaV3Badge: string
 {
-    case BottomRight = 'bottomright';
     case BottomLeft = 'bottomleft';
+    case BottomRight = 'bottomright';
     case Hidden = 'hidden';
 }

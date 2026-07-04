@@ -16,5 +16,6 @@ final readonly class VerificationResult
         public ?string $action = null,
         public ?string $hostname = null,
         public ?string $challengeTs = null,
-    ) {}
+    ) {
+    }
 }
