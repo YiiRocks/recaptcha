@@ -11,7 +11,7 @@ use Yiisoft\Html\Html;
 
 final class RecaptchaV2Field extends InputField
 {
-    private const DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
+    private const string DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
     private string $callback = '';
     private string $errorCallback = '';
     private string $expiredCallback = '';

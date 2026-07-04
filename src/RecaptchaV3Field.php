@@ -12,20 +12,20 @@ use Yiisoft\Translator\TranslatorInterface;
 
 final class RecaptchaV3Field extends InputField
 {
-    private const DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
+    private const string DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
 
-    private const DEFAULT_LEGAL_NOTICE = 'This site is protected by reCAPTCHA and the Google '
+    private const string DEFAULT_LEGAL_NOTICE = 'This site is protected by reCAPTCHA and the Google '
         . '<a href="' . self::PRIVACY_URL . '">' . self::PRIVACY_POLICY_TEXT . '</a> and '
         . '<a href="' . self::TERMS_URL . '">' . self::TERMS_OF_SERVICE_TEXT . '</a> apply.';
-    private const HIDDEN_BADGE_STYLE = '<style>.grecaptcha-badge{visibility:hidden !important;}</style>';
+    private const string HIDDEN_BADGE_STYLE = '<style>.grecaptcha-badge{visibility:hidden !important;}</style>';
 
-    private const LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
+    private const string LEGAL_NOTICE_MESSAGE_ID = 'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.';
 
-    private const PRIVACY_POLICY_TEXT = 'Privacy Policy';
+    private const string PRIVACY_POLICY_TEXT = 'Privacy Policy';
 
-    private const PRIVACY_URL = 'https://policies.google.com/privacy';
-    private const TERMS_OF_SERVICE_TEXT = 'Terms of Service';
-    private const TERMS_URL = 'https://policies.google.com/terms';
+    private const string PRIVACY_URL = 'https://policies.google.com/privacy';
+    private const string TERMS_OF_SERVICE_TEXT = 'Terms of Service';
+    private const string TERMS_URL = 'https://policies.google.com/terms';
     private string $action = '';
     private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
     private int $executeTimeoutMs = 15000;
