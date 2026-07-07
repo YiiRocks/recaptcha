@@ -3,8 +3,15 @@
 [![Packagist Version](https://img.shields.io/packagist/v/yiirocks/recaptcha.svg)](https://packagist.org/packages/yiirocks/recaptcha)
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/yiirocks/recaptcha.svg)](https://php.net/)
 [![Packagist Downloads](https://img.shields.io/packagist/dt/yiirocks/recaptcha.svg)](https://packagist.org/packages/yiirocks/recaptcha)
-[![GitHub License](https://img.shields.io/github/license/yiirocks/recaptcha.svg)](https://github.com/yiirocks/recaptcha/blob/master/LICENSE)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/YiiRocks/recaptcha/build.yml?branch=master)](https://github.com/YiiRocks/recaptcha/actions)
+[![GitHub License](https://img.shields.io/github/license/yiirocks/recaptcha.svg)](https://github.com/yiirocks/recaptcha/blob/main/LICENSE.md)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/YiiRocks/recaptcha/build.yml?branch=main)](https://github.com/YiiRocks/recaptcha/actions)
+
+Stats for Nerds
+
+[![Coverage](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyiirocks%2Frecaptcha%2Fbadges%2Fcoverage.json)](https://github.com/yiirocks/recaptcha/tree/badges)
+[![MSI](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyiirocks%2Frecaptcha%2Fbadges%2Fmsi.json)](https://github.com/yiirocks/recaptcha/tree/badges)
+[![Tests](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyiirocks%2Frecaptcha%2Fbadges%2Ftests.json)](https://github.com/yiirocks/recaptcha/tree/badges)
+[![Assertions](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fyiirocks%2Frecaptcha%2Fbadges%2Fassertions.json)](https://github.com/yiirocks/recaptcha/tree/badges)
 
 Google reCAPTCHA v2 and v3 field + server-side validator for Yii3.
 

@@ -216,6 +216,17 @@ final class RecaptchaClientTest extends TestCase
         $this->assertSame('login', $result->action);
     }
 
+    public function testVerifyWithNonArrayResponseBodyReturnsFailure(): void
+    {
+        $client = $this->_createMockClientBody('true');
+        $recaptchaClient = $this->_createClient($client);
+
+        $result = $recaptchaClient->verify('token');
+
+        $this->assertFalse($result->success);
+        $this->assertContains('http-error', $result->errorCodes);
+    }
+
     public function testVerifyWithSecret(): void
     {
         $client = $this->_createMockClient(['success' => true]);

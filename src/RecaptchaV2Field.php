@@ -4,25 +4,19 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha;
 
-use Yiisoft\Form\Field\Base\InputField;
 use Yiisoft\FormModel\FormModelInputData;
 use Yiisoft\FormModel\FormModelInterface;
-use Yiisoft\Html\Html;
 
-final class RecaptchaV2Field extends InputField
+final class RecaptchaV2Field extends AbstractRecaptchaField
 {
-    private const string DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
+
     private string $callback = '';
     private string $errorCallback = '';
     private string $expiredCallback = '';
     private string $id = '';
-    private string $jsApiUrl = self::DEFAULT_JS_API_URL;
-
-    private ?string $siteKey = null;
     private RecaptchaV2Size $size = RecaptchaV2Size::Normal;
     private RecaptchaV2Theme $theme = RecaptchaV2Theme::Light;
     private RecaptchaV2Type $type = RecaptchaV2Type::Image;
-
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
@@ -56,20 +50,6 @@ final class RecaptchaV2Field extends InputField
         return $new;
     }
 
-    public function withJsApiUrl(string $url): static
-    {
-        $new = clone $this;
-        $new->jsApiUrl = $url;
-        return $new;
-    }
-
-    public function withSiteKey(string $siteKey): static
-    {
-        $new = clone $this;
-        $new->siteKey = $siteKey;
-        return $new;
-    }
-
     public function withSize(RecaptchaV2Size $size): static
     {
         $new = clone $this;
@@ -89,44 +69,6 @@ final class RecaptchaV2Field extends InputField
         $new = clone $this;
         $new->type = $type;
         return $new;
-    }
-
-    #[\Override]
-    protected function beforeRender(): void
-    {
-        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()->siteKeyV2;
-        if ($siteKey === null || $siteKey === '') {
-            throw new Exception\MissingSiteKeyException();
-        }
-        $this->siteKey = $siteKey;
-
-        $this->template = "{input}\n{error}";
-        $this->inputContainerTag = null;
-        $this->beforeInput = '';
-        $this->afterInput = '';
-
-        $useContainer = RecaptchaRegistry::containerUseContainer();
-        if ($useContainer !== null && $this->useContainer === true) {
-            $this->useContainer = $useContainer;
-        }
-
-        $tag = RecaptchaRegistry::containerTag();
-        if ($tag !== null && $tag !== '' && $this->containerTag === 'div') {
-            $this->containerTag = $tag;
-        }
-
-        $attributes = RecaptchaRegistry::containerAttributes();
-        if ($attributes !== null) {
-            foreach ($attributes as $key => $value) {
-                if (!isset($this->containerAttributes[$key])) {
-                    $this->containerAttributes[$key] = $value;
-                }
-            }
-        }
-
-        if (!isset($this->containerAttributes['class'])) {
-            Html::addCssClass($this->containerAttributes, ['mb-3']);
-        }
     }
 
     #[\Override]
@@ -158,5 +100,16 @@ final class RecaptchaV2Field extends InputField
         $html .= "\n<script src=\"" . $this->jsApiUrl . "\" async defer></script>\n";
 
         return $html;
+    }
+
+    #[\Override]
+    protected function prepareRender(): void
+    {
+    }
+
+    #[\Override]
+    protected function resolveSiteKey(): ?string
+    {
+        return RecaptchaRegistry::client()?->getConfig()->siteKeyV2;
     }
 }

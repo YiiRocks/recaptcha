@@ -4,51 +4,73 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha\Tests;
 
-use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use YiiRocks\Recaptcha\RecaptchaClient;
+use YiiRocks\Recaptcha\Exception\InvalidRuleException;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 use YiiRocks\Recaptcha\RecaptchaConfig;
 use YiiRocks\Recaptcha\RecaptchaRegistry;
 use YiiRocks\Recaptcha\RecaptchaV2Rule;
 use YiiRocks\Recaptcha\RecaptchaV2RuleHandler;
+use YiiRocks\Recaptcha\RecaptchaV3Rule;
+use Yiisoft\RequestProvider\RequestNotSetException;
 use Yiisoft\RequestProvider\RequestProvider;
+use Yiisoft\RequestProvider\RequestProviderInterface;
 use Yiisoft\Translator\TranslatorInterface;
 use Yiisoft\Validator\ValidationContext;
 
-final class RecaptchaV2RuleHandlerTest extends TestCase
+final class RecaptchaV2RuleHandlerTest extends AbstractRecaptchaRuleHandler
 {
     private RecaptchaV2RuleHandler $_handler;
 
     protected function setUp(): void
     {
-        $factory = new Psr17Factory();
-
-        $httpClient = $this->createStub(ClientInterface::class);
-        $httpClient->method('sendRequest')->willReturn(
-            new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode([
-                'success' => true,
-            ]))),
-        );
-
-        $config = new RecaptchaConfig(secretV2: 'test-secret');
-        $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
-
-        RecaptchaRegistry::configure($client);
-
+        parent::setUp();
         $this->_handler = new RecaptchaV2RuleHandler();
     }
 
-    protected function tearDown(): void
+    public function testClientIpIsNullWhenNoProviderConfigured(): void
     {
-        RecaptchaRegistry::reset();
+        $handler = new RecaptchaV2RuleHandler(client: $this->createClient(['success' => true]));
+        $rule = new RecaptchaV2Rule(sendRemoteIp: true);
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
+    }
+
+    public function testClientIpIsNullWhenRemoteAddrIsNotAString(): void
+    {
+        $serverRequest = new ServerRequest('POST', '/', [], null, '1.1', ['REMOTE_ADDR' => null]);
+        $requestProvider = new RequestProvider($serverRequest);
+        $handler = new RecaptchaV2RuleHandler(
+            client: $this->createClient(['success' => true]),
+            requestProvider: $requestProvider,
+        );
+        $rule = new RecaptchaV2Rule(sendRemoteIp: true);
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
+    }
+
+    public function testClientIpIsNullWhenRequestNotSet(): void
+    {
+        $requestProvider = $this->createStub(RequestProviderInterface::class);
+        $requestProvider->method('get')->willThrowException(new RequestNotSetException());
+        $handler = new RecaptchaV2RuleHandler(
+            client: $this->createClient(['success' => true]),
+            requestProvider: $requestProvider,
+        );
+        $rule = new RecaptchaV2Rule(sendRemoteIp: true);
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
     }
 
     public function testClientIpNotSentWhenRuleDisablesSendRemoteIp(): void
     {
-        [$client, $capture] = $this->_createCapturingClient(['success' => true], true);
+        [$client, $capture] = $this->createCapturingClient(['success' => true], true);
 
         $serverRequest = new ServerRequest('POST', '/', [], null, '1.1', ['REMOTE_ADDR' => '9.9.9.9']);
         $requestProvider = new RequestProvider($serverRequest);
@@ -64,7 +86,7 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
 
     public function testClientIpSentOnlyWhenRuleEnablesSendRemoteIp(): void
     {
-        [$client, $capture] = $this->_createCapturingClient(['success' => true], true);
+        [$client, $capture] = $this->createCapturingClient(['success' => true], true);
 
         $serverRequest = new ServerRequest('POST', '/', [], null, '1.1', ['REMOTE_ADDR' => '9.9.9.9']);
         $requestProvider = new RequestProvider($serverRequest);
@@ -80,7 +102,7 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
 
     public function testErrorIncludesErrorCodesParameter(): void
     {
-        $client = $this->_createClient([
+        $client = $this->createClient([
             'success' => false,
             'error-codes' => ['invalid-input-response'],
         ]);
@@ -95,8 +117,8 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
 
     public function testExplicitClientTakesPrecedenceOverRegistry(): void
     {
-        $explicitClient = $this->_createClient(['success' => true]);
-        RecaptchaRegistry::configure($this->_createClient(['success' => false]));
+        $explicitClient = $this->createClient(['success' => true]);
+        RecaptchaRegistry::configure($this->createClient(['success' => false]));
 
         $handler = new RecaptchaV2RuleHandler(client: $explicitClient);
         $rule = new RecaptchaV2Rule();
@@ -107,7 +129,7 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
 
     public function testTranslatorUsesExplicitlyInjectedTranslatorOverRegistry(): void
     {
-        $client = $this->_createClient(['success' => false]);
+        $client = $this->createClient(['success' => false]);
 
         $explicitTranslator = $this->createStub(TranslatorInterface::class);
         $explicitTranslator->method('translate')->willReturn('explicit-translation');
@@ -116,7 +138,7 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
         $registryTranslator->method('translate')->willReturn('registry-translation');
 
         RecaptchaRegistry::configure(
-            client: $this->_createClient(['success' => true]),
+            client: $this->createClient(['success' => true]),
             translator: $registryTranslator,
         );
 
@@ -151,43 +173,41 @@ final class RecaptchaV2RuleHandlerTest extends TestCase
         $this->assertTrue($result->isValid());
     }
 
-    /**
-     * @return array{0: RecaptchaClient, 1: object{request: ?RequestInterface}}
-     */
-    private function _createCapturingClient(array $responseData, bool $sendRemoteIp = false): array
+    public function testValidateThrowsForUnsupportedRule(): void
     {
-        $capture = new class() {
-            public ?RequestInterface $request = null;
-        };
+        $handler = new RecaptchaV2RuleHandler(client: $this->createClient(['success' => true]));
 
-        $httpClient = $this->createStub(ClientInterface::class);
-        $httpClient->method('sendRequest')->willReturnCallback(
-            function (RequestInterface $request) use ($capture, $responseData) {
-                $capture->request = $request;
-                $factory = new Psr17Factory();
+        $this->expectException(InvalidRuleException::class);
+        $this->expectExceptionMessage('Expected ' . RecaptchaV2Rule::class . ', got ' . RecaptchaV3Rule::class . '.');
 
-                return new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData)));
-            },
-        );
-
-        $factory = new Psr17Factory();
-        $config = new RecaptchaConfig(secretV2: 'test-secret', sendRemoteIp: $sendRemoteIp);
-        $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
-
-        return [$client, $capture];
+        $handler->validate('token', new RecaptchaV3Rule(), new ValidationContext());
     }
 
-    private function _createClient(array $responseData): RecaptchaClient
+    public function testValidateThrowsWhenClientMissing(): void
     {
-        $factory = new Psr17Factory();
+        RecaptchaRegistry::reset();
+        $handler = new RecaptchaV2RuleHandler();
+        $rule = new RecaptchaV2Rule();
 
-        $httpClient = $this->createStub(ClientInterface::class);
-        $httpClient->method('sendRequest')->willReturn(
-            new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData))),
-        );
+        $this->expectException(MissingClientException::class);
+        $this->expectExceptionMessage('RecaptchaClient is not configured.');
 
-        $config = new RecaptchaConfig(secretV2: 'test-secret');
+        $handler->validate('token', $rule, new ValidationContext());
+    }
 
-        return new RecaptchaClient($config, $httpClient, $factory, $factory);
+    public function testValidateWithSecretUsesProvidedSecret(): void
+    {
+        $client = $this->createClient(['success' => true]);
+        $handler = new RecaptchaV2RuleHandler(client: $client);
+        $rule = new RecaptchaV2Rule(secret: 'custom-secret');
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
+    }
+
+    protected function createConfig(string $secret, bool $sendRemoteIp = false): RecaptchaConfig
+    {
+        return new RecaptchaConfig(secretV2: $secret, sendRemoteIp: $sendRemoteIp);
     }
 }

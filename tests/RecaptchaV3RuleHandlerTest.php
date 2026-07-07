@@ -4,53 +4,31 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha\Tests;
 
-use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Client\ClientInterface;
-use Psr\Http\Message\RequestInterface;
-use YiiRocks\Recaptcha\RecaptchaClient;
+use YiiRocks\Recaptcha\Exception\InvalidRuleException;
+use YiiRocks\Recaptcha\Exception\MissingClientException;
 use YiiRocks\Recaptcha\RecaptchaConfig;
 use YiiRocks\Recaptcha\RecaptchaRegistry;
+use YiiRocks\Recaptcha\RecaptchaV2Rule;
 use YiiRocks\Recaptcha\RecaptchaV3Rule;
 use YiiRocks\Recaptcha\RecaptchaV3RuleHandler;
 use Yiisoft\RequestProvider\RequestProvider;
 use Yiisoft\Translator\TranslatorInterface;
 use Yiisoft\Validator\ValidationContext;
 
-final class RecaptchaV3RuleHandlerTest extends TestCase
+final class RecaptchaV3RuleHandlerTest extends AbstractRecaptchaRuleHandler
 {
     private RecaptchaV3RuleHandler $_handler;
 
     protected function setUp(): void
     {
-        $factory = new Psr17Factory();
-
-        $httpClient = $this->createStub(ClientInterface::class);
-        $httpClient->method('sendRequest')->willReturn(
-            new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode([
-                'success' => true,
-                'score' => 0.9,
-                'action' => 'submit',
-            ]))),
-        );
-
-        $config = new RecaptchaConfig(secretV3: 'test-secret');
-        $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
-
-        RecaptchaRegistry::configure($client);
-
+        parent::setUp();
         $this->_handler = new RecaptchaV3RuleHandler();
-    }
-
-    protected function tearDown(): void
-    {
-        RecaptchaRegistry::reset();
     }
 
     public function testActionMismatchErrorParametersWhenActionIsPresent(): void
     {
-        $client = $this->_createClient(['success' => true, 'score' => 0.9, 'action' => 'register']);
+        $client = $this->createClient(['success' => true, 'score' => 0.9, 'action' => 'register']);
         $handler = new RecaptchaV3RuleHandler(client: $client);
         $rule = new RecaptchaV3Rule(action: 'login');
 
@@ -61,7 +39,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testActionMismatchErrorParametersWhenActionMissing(): void
     {
-        $client = $this->_createClient(['success' => true, 'score' => 0.9]);
+        $client = $this->createClient(['success' => true, 'score' => 0.9]);
         $handler = new RecaptchaV3RuleHandler(client: $client);
         $rule = new RecaptchaV3Rule(action: 'login');
 
@@ -74,7 +52,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testClientIpNotSentWhenRuleDisablesSendRemoteIp(): void
     {
-        [$client, $capture] = $this->_createCapturingClient(
+        [$client, $capture] = $this->createCapturingClient(
             ['success' => true, 'score' => 0.9, 'action' => 'submit'],
             true,
         );
@@ -93,7 +71,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testClientIpSentOnlyWhenRuleEnablesSendRemoteIp(): void
     {
-        [$client, $capture] = $this->_createCapturingClient(
+        [$client, $capture] = $this->createCapturingClient(
             ['success' => true, 'score' => 0.9, 'action' => 'submit'],
             true,
         );
@@ -112,8 +90,8 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testExplicitClientTakesPrecedenceOverRegistry(): void
     {
-        $explicitClient = $this->_createClient(['success' => true, 'score' => 0.9, 'action' => 'submit']);
-        RecaptchaRegistry::configure($this->_createClient(['success' => false]));
+        $explicitClient = $this->createClient(['success' => true, 'score' => 0.9, 'action' => 'submit']);
+        RecaptchaRegistry::configure($this->createClient(['success' => false]));
 
         $handler = new RecaptchaV3RuleHandler(client: $explicitClient);
         $rule = new RecaptchaV3Rule();
@@ -124,7 +102,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testFailureErrorIncludesErrorCodesParameter(): void
     {
-        $client = $this->_createClient([
+        $client = $this->createClient([
             'success' => false,
             'error-codes' => ['timeout-or-duplicate'],
         ]);
@@ -145,7 +123,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testScoreTooLowErrorParametersWhenScoreIsPresent(): void
     {
-        $client = $this->_createClient(['success' => true, 'score' => 0.3, 'action' => 'submit']);
+        $client = $this->createClient(['success' => true, 'score' => 0.3, 'action' => 'submit']);
         $handler = new RecaptchaV3RuleHandler(client: $client);
         $rule = new RecaptchaV3Rule(threshold: 0.5);
 
@@ -156,7 +134,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testScoreTooLowErrorParametersWhenScoreMissing(): void
     {
-        $client = $this->_createClient(['success' => true]);
+        $client = $this->createClient(['success' => true]);
         $handler = new RecaptchaV3RuleHandler(client: $client);
         $rule = new RecaptchaV3Rule(threshold: 0.5);
 
@@ -169,7 +147,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testTranslatorUsesExplicitlyInjectedTranslatorOverRegistry(): void
     {
-        $client = $this->_createClient(['success' => false]);
+        $client = $this->createClient(['success' => false]);
 
         $explicitTranslator = $this->createStub(TranslatorInterface::class);
         $explicitTranslator->method('translate')->willReturn('explicit-translation');
@@ -178,7 +156,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
         $registryTranslator->method('translate')->willReturn('registry-translation');
 
         RecaptchaRegistry::configure(
-            client: $this->_createClient(['success' => true, 'score' => 0.9, 'action' => 'submit']),
+            client: $this->createClient(['success' => true, 'score' => 0.9, 'action' => 'submit']),
             translator: $registryTranslator,
         );
 
@@ -199,7 +177,7 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
 
     public function testValidateSucceedsWhenScoreExactlyMeetsThreshold(): void
     {
-        $client = $this->_createClient(['success' => true, 'score' => 0.5, 'action' => 'submit']);
+        $client = $this->createClient(['success' => true, 'score' => 0.5, 'action' => 'submit']);
         $handler = new RecaptchaV3RuleHandler(client: $client);
         $rule = new RecaptchaV3Rule(threshold: 0.5);
 
@@ -216,43 +194,41 @@ final class RecaptchaV3RuleHandlerTest extends TestCase
         $this->assertTrue($result->isValid());
     }
 
-    /**
-     * @return array{0: RecaptchaClient, 1: object{request: ?RequestInterface}}
-     */
-    private function _createCapturingClient(array $responseData, bool $sendRemoteIp = false): array
+    public function testValidateThrowsForUnsupportedRule(): void
     {
-        $capture = new class() {
-            public ?RequestInterface $request = null;
-        };
+        $handler = new RecaptchaV3RuleHandler(client: $this->createClient(['success' => true, 'score' => 0.9, 'action' => 'submit']));
 
-        $httpClient = $this->createStub(ClientInterface::class);
-        $httpClient->method('sendRequest')->willReturnCallback(
-            function (RequestInterface $request) use ($capture, $responseData) {
-                $capture->request = $request;
-                $factory = new Psr17Factory();
+        $this->expectException(InvalidRuleException::class);
+        $this->expectExceptionMessage('Expected ' . RecaptchaV3Rule::class . ', got ' . RecaptchaV2Rule::class . '.');
 
-                return new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData)));
-            },
-        );
-
-        $factory = new Psr17Factory();
-        $config = new RecaptchaConfig(secretV3: 'test-secret', sendRemoteIp: $sendRemoteIp);
-        $client = new RecaptchaClient($config, $httpClient, $factory, $factory);
-
-        return [$client, $capture];
+        $handler->validate('token', new RecaptchaV2Rule(), new ValidationContext());
     }
 
-    private function _createClient(array $responseData): RecaptchaClient
+    public function testValidateThrowsWhenClientMissing(): void
     {
-        $factory = new Psr17Factory();
+        RecaptchaRegistry::reset();
+        $handler = new RecaptchaV3RuleHandler();
+        $rule = new RecaptchaV3Rule();
 
-        $httpClient = $this->createStub(ClientInterface::class);
-        $httpClient->method('sendRequest')->willReturn(
-            new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData))),
-        );
+        $this->expectException(MissingClientException::class);
+        $this->expectExceptionMessage('RecaptchaClient is not configured.');
 
-        $config = new RecaptchaConfig(secretV3: 'test-secret');
+        $handler->validate('token', $rule, new ValidationContext());
+    }
 
-        return new RecaptchaClient($config, $httpClient, $factory, $factory);
+    public function testValidateWithSecretUsesProvidedSecret(): void
+    {
+        $client = $this->createClient(['success' => true, 'score' => 0.9, 'action' => 'submit']);
+        $handler = new RecaptchaV3RuleHandler(client: $client);
+        $rule = new RecaptchaV3Rule(secret: 'custom-secret');
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
+    }
+
+    protected function createConfig(string $secret, bool $sendRemoteIp = false): RecaptchaConfig
+    {
+        return new RecaptchaConfig(secretV3: $secret, sendRemoteIp: $sendRemoteIp);
     }
 }

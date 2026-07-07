@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace YiiRocks\Recaptcha\Tests;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
-use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
-use ReflectionMethod;
-use YiiRocks\Recaptcha\Exception\MissingSiteKeyException;
 use YiiRocks\Recaptcha\RecaptchaClient;
 use YiiRocks\Recaptcha\RecaptchaConfig;
 use YiiRocks\Recaptcha\RecaptchaRegistry;
@@ -16,26 +13,9 @@ use YiiRocks\Recaptcha\RecaptchaV3Badge;
 use YiiRocks\Recaptcha\RecaptchaV3Field;
 use Yiisoft\FormModel\FormModel;
 use Yiisoft\Translator\TranslatorInterface;
-use Yiisoft\Validator\Result;
 
-final class RecaptchaV3FieldTest extends TestCase
+final class RecaptchaV3FieldTest extends AbstractRecaptchaField
 {
-    protected function setUp(): void
-    {
-        RecaptchaRegistry::configure(
-            new RecaptchaClient(
-                new RecaptchaConfig(),
-                $this->createStub(ClientInterface::class),
-                new Psr17Factory(),
-                new Psr17Factory(),
-            ),
-        );
-    }
-
-    protected function tearDown(): void
-    {
-        RecaptchaRegistry::reset();
-    }
 
     public function testDefaultFieldIdIsDerivedFromFieldName(): void
     {
@@ -104,17 +84,6 @@ final class RecaptchaV3FieldTest extends TestCase
         $this->assertStringContainsString('name="ContactForm[captcha]"', $html);
     }
 
-    public function testGenerateInputThrowsWhenSiteKeyNotSet(): void
-    {
-        $field = RecaptchaV3Field::field($this->createFormModel(), 'captcha');
-
-        $method = new ReflectionMethod($field, 'generateInput');
-
-        $this->expectException(MissingSiteKeyException::class);
-
-        $method->invoke($field);
-    }
-
     public function testJsonOptionsEscapeSpecialCharacters(): void
     {
         $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
@@ -127,23 +96,6 @@ final class RecaptchaV3FieldTest extends TestCase
         $this->assertStringContainsString('\u0026', $html);
         $this->assertStringContainsString('\u0027', $html);
         $this->assertStringContainsString('\u0022', $html);
-    }
-
-    public function testMultipleWidgetsHaveUniqueInputIds(): void
-    {
-        $html1 = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-        $html2 = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        preg_match('/id="([^"]+)"/', $html1, $m1);
-        preg_match('/id="([^"]+)"/', $html2, $m2);
-
-        $this->assertNotNull($m1[1] ?? null);
-        $this->assertNotNull($m2[1] ?? null);
-        $this->assertNotSame($m1[1], $m2[1]);
     }
 
     public function testNameOverridesAutoDerivation(): void
@@ -162,60 +114,6 @@ final class RecaptchaV3FieldTest extends TestCase
             ->render();
 
         $this->assertStringContainsString('name="g-recaptcha-response"', $html);
-    }
-
-    public function testPerFieldOverrideTakesPrecedenceOverRegistryDefaults(): void
-    {
-        RecaptchaRegistry::setContainerDefaults([
-            'attributes' => ['class' => 'global-class'],
-        ]);
-
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->containerAttributes(['class' => 'per-field'])
-            ->render();
-
-        $this->assertStringStartsWith('<div class="per-field">', $html);
-    }
-
-    public function testRegistryContainerDefaultsApplied(): void
-    {
-        RecaptchaRegistry::setContainerDefaults([
-            'attributes' => ['class' => 'global-class'],
-        ]);
-
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringStartsWith('<div class="global-class">' . "\n", $html);
-    }
-
-    public function testRegistryContainerTagOverridesDefaultDiv(): void
-    {
-        RecaptchaRegistry::setContainerDefaults([
-            'tag' => 'section',
-        ]);
-
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringStartsWith('<section class="mb-3">', $html);
-    }
-
-    public function testRegistryUseContainerFalseDisablesContainer(): void
-    {
-        RecaptchaRegistry::setContainerDefaults([
-            'useContainer' => false,
-        ]);
-
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringNotContainsString('mb-3', $html);
-        $this->assertStringStartsWith('<script', $html);
     }
 
     public function testRenderExactHtmlWithDefaultBadgeAndAction(): void
@@ -360,126 +258,6 @@ final class RecaptchaV3FieldTest extends TestCase
         $this->assertStringNotContainsString('Privacy Policy', $html);
     }
 
-    public function testRenderWithContainerClass(): void
-    {
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->containerClass('form-group', 'custom')
-            ->render();
-
-        $this->assertStringStartsWith('<div class="form-group custom">', $html);
-    }
-
-    public function testRenderWithCustomContainerAttributes(): void
-    {
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->containerAttributes(['class' => 'my-wrapper', 'data-theme' => 'dark'])
-            ->render();
-
-        $this->assertStringStartsWith('<div class="my-wrapper" data-theme="dark">', $html);
-    }
-
-    public function testRenderWithCustomContainerTag(): void
-    {
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->containerTag('section')
-            ->render();
-
-        $this->assertStringStartsWith('<section class="mb-3">', $html);
-        $this->assertStringEndsWith('</section>', $html);
-    }
-
-    public function testRenderWithFormModelShowsErrors(): void
-    {
-        $result = new Result();
-        $result->addError('The captcha is invalid.', valuePath: ['captcha']);
-
-        $formModel = new class() extends FormModel {
-            public string $captcha = '';
-        };
-        $formModel->processValidationResult($result);
-
-        $html = RecaptchaV3Field::field($formModel, 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringContainsString('The captcha is invalid.', $html);
-    }
-
-    public function testRenderWithFormModelShowsNoErrorsForDifferentAttribute(): void
-    {
-        $result = new Result();
-        $result->addError('The captcha is invalid.', valuePath: ['captcha']);
-
-        $formModel = new class() extends FormModel {
-            public string $captcha = '';
-            public string $other = '';
-        };
-        $formModel->processValidationResult($result);
-
-        $html = RecaptchaV3Field::field($formModel, 'other')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringNotContainsString('invalid-feedback', $html);
-    }
-
-    public function testRenderWithFormModelShowsNoErrorsWhenNoErrors(): void
-    {
-        $formModel = new class() extends FormModel {
-            public string $captcha = '';
-        };
-        $formModel->processValidationResult(new Result());
-
-        $html = RecaptchaV3Field::field($formModel, 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringNotContainsString('invalid-feedback', $html);
-    }
-
-    public function testRenderWithoutContainer(): void
-    {
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->useContainer(false)
-            ->render();
-
-        $this->assertStringStartsWith('<script', $html);
-        $this->assertStringNotContainsString('mb-3', $html);
-    }
-
-    public function testRenderWrappedInDivWithMb3ByDefault(): void
-    {
-        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
-            ->withSiteKey('test-key')
-            ->render();
-
-        $this->assertStringStartsWith('<div class="mb-3">' . "\n", $html);
-        $this->assertStringEndsWith("\n" . '</div>', $html);
-    }
-
-    public function testThrowsWhenRegistryHasNoClientConfigured(): void
-    {
-        $reflection = new \ReflectionClass(RecaptchaRegistry::class);
-        $property = $reflection->getProperty('client');
-        $property->setValue(null, null);
-
-        $this->expectException(MissingSiteKeyException::class);
-
-        RecaptchaV3Field::field($this->createFormModel(), 'captcha')->render();
-    }
-
-    public function testThrowsWithoutSiteKey(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Site key must be set');
-
-        RecaptchaV3Field::field($this->createFormModel(), 'captcha')->render();
-    }
-
     public function testWithMethodsDoNotMutateOriginalInstance(): void
     {
         $base = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
@@ -518,11 +296,8 @@ final class RecaptchaV3FieldTest extends TestCase
         $this->assertStringContainsString('"timeout":5000', $base->withExecuteTimeout(5000)->render());
         $this->assertStringContainsString('"timeout":15000', $base->render());
     }
-
-    private function createFormModel(): FormModel
+    protected function fieldClass(): string
     {
-        return new class() extends FormModel {
-            public string $captcha = '';
-        };
+        return RecaptchaV3Field::class;
     }
 }

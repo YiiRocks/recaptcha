@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace YiiRocks\Recaptcha;
 
-use Yiisoft\Form\Field\Base\InputField;
 use Yiisoft\FormModel\FormModelInputData;
 use Yiisoft\FormModel\FormModelInterface;
 use Yiisoft\Html\Html;
 use Yiisoft\Translator\TranslatorInterface;
 
-final class RecaptchaV3Field extends InputField
+final class RecaptchaV3Field extends AbstractRecaptchaField
 {
-    private const string DEFAULT_JS_API_URL = 'https://www.google.com/recaptcha/api.js';
 
     private const string DEFAULT_LEGAL_NOTICE = 'This site is protected by reCAPTCHA and the Google '
         . '<a href="' . self::PRIVACY_URL . '">' . self::PRIVACY_POLICY_TEXT . '</a> and '
@@ -30,11 +28,7 @@ final class RecaptchaV3Field extends InputField
     private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
     private int $executeTimeoutMs = 15000;
     private string $formId = '';
-    private string $jsApiUrl = self::DEFAULT_JS_API_URL;
-
-    private ?string $siteKey = null;
     private ?TranslatorInterface $translator = null;
-
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
@@ -68,65 +62,11 @@ final class RecaptchaV3Field extends InputField
         return $new;
     }
 
-    public function withJsApiUrl(string $url): static
-    {
-        $new = clone $this;
-        $new->jsApiUrl = $url;
-        return $new;
-    }
-
-    public function withSiteKey(string $siteKey): static
-    {
-        $new = clone $this;
-        $new->siteKey = $siteKey;
-        return $new;
-    }
-
     public function withTranslator(?TranslatorInterface $translator): static
     {
         $new = clone $this;
         $new->translator = $translator;
         return $new;
-    }
-
-    #[\Override]
-    protected function beforeRender(): void
-    {
-        $siteKey = $this->siteKey ?? RecaptchaRegistry::client()?->getConfig()->siteKeyV3;
-        if ($siteKey === null || $siteKey === '') {
-            throw new Exception\MissingSiteKeyException();
-        }
-        $this->siteKey = $siteKey;
-
-        $this->translator ??= RecaptchaRegistry::translator();
-
-        $this->template = "{input}\n{error}";
-        $this->inputContainerTag = null;
-        $this->beforeInput = '';
-        $this->afterInput = '';
-
-        $useContainer = RecaptchaRegistry::containerUseContainer();
-        if ($useContainer !== null && $this->useContainer === true) {
-            $this->useContainer = $useContainer;
-        }
-
-        $tag = RecaptchaRegistry::containerTag();
-        if ($tag !== null && $tag !== '' && $this->containerTag === 'div') {
-            $this->containerTag = $tag;
-        }
-
-        $attributes = RecaptchaRegistry::containerAttributes();
-        if ($attributes !== null) {
-            foreach ($attributes as $key => $value) {
-                if (!isset($this->containerAttributes[$key])) {
-                    $this->containerAttributes[$key] = $value;
-                }
-            }
-        }
-
-        if (!isset($this->containerAttributes['class'])) {
-            Html::addCssClass($this->containerAttributes, ['mb-3']);
-        }
     }
 
     #[\Override]
@@ -210,6 +150,18 @@ final class RecaptchaV3Field extends InputField
         }
 
         return $html;
+    }
+
+    #[\Override]
+    protected function prepareRender(): void
+    {
+        $this->translator ??= RecaptchaRegistry::translator();
+    }
+
+    #[\Override]
+    protected function resolveSiteKey(): ?string
+    {
+        return RecaptchaRegistry::client()?->getConfig()->siteKeyV3;
     }
 
     private function translate(string $message): string
