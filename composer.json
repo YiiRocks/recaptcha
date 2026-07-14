@@ -14,7 +14,7 @@
         "bot"
     ],
     "homepage": "https://www.yii.rocks/recaptcha/",
-    "license": "MIT",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Mr.42",
@@ -94,5 +94,11 @@
             "infection/extension-installer": true,
             "yiisoft/config": true
         }
-    }
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/YiiRocks"
+        }
+    ]
 }
