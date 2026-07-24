@@ -1,11 +1,16 @@
 # Yii reCAPTCHA Change Log
 
-## 1.0.4 under development
+## 1.0.4 July 24, 2026
 
 - Chg: Extract shared abstract base classes `AbstractRecaptchaField`, `AbstractRecaptchaRule` and
   `AbstractRecaptchaRuleHandler` to de-duplicate the v2/v3 verticals (internal only, no public API change)
 - Chg: De-duplicate field and rule-handler tests via shared abstract test bases `AbstractRecaptchaField`
   and `AbstractRecaptchaRuleHandler`
+- Chg: Change license from MIT to BSD-3-Clause; add homepage and funding links to `composer.json`
+- Chg: Remove `translation.category` config option — `recaptcha` is now the hardcoded message category
+- Chg: Trim `README.md` to a short overview pointing to the full docs at yii.rocks/recaptcha
+- Bug: Lower `RecaptchaV3Field`'s default `withExecuteTimeout()` from 15000ms to 5000ms — the fallback
+  submit timer was leaving the form looking hung for far too long if `grecaptcha.execute()` stalls
 
 ## 1.0.3 July 04, 2026
 
