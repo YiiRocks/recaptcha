@@ -26,7 +26,7 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
     private const string TERMS_URL = 'https://policies.google.com/terms';
     private string $action = '';
     private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
-    private int $executeTimeoutMs = 15000;
+    private int $executeTimeoutMs = 5000;
     private string $formId = '';
     private ?TranslatorInterface $translator = null;
     public static function field(FormModelInterface $formModel, string $attribute): static

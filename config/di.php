@@ -36,28 +36,26 @@ return [
         );
     },
 
-    RecaptchaV2RuleHandler::class => static function (ContainerInterface $container) use ($params): RecaptchaV2RuleHandler {
+    RecaptchaV2RuleHandler::class => static function (ContainerInterface $container): RecaptchaV2RuleHandler {
         return new RecaptchaV2RuleHandler(
             client: $container->has(RecaptchaClient::class) ? $container->get(RecaptchaClient::class) : null,
             requestProvider: $container->has(RequestProviderInterface::class)
                 ? $container->get(RequestProviderInterface::class)
                 : null,
-            translationCategory: $params['yiirocks/recaptcha']['translation.category'],
         );
     },
 
-    RecaptchaV3RuleHandler::class => static function (ContainerInterface $container) use ($params): RecaptchaV3RuleHandler {
+    RecaptchaV3RuleHandler::class => static function (ContainerInterface $container): RecaptchaV3RuleHandler {
         return new RecaptchaV3RuleHandler(
             client: $container->has(RecaptchaClient::class) ? $container->get(RecaptchaClient::class) : null,
             requestProvider: $container->has(RequestProviderInterface::class)
                 ? $container->get(RequestProviderInterface::class)
                 : null,
-            translationCategory: $params['yiirocks/recaptcha']['translation.category'],
         );
     },
 
     'recaptcha.categorySource' => [
-        'definition' => static function () use ($params): CategorySource {
+        'definition' => static function (): CategorySource {
             $reader = class_exists(MessageSource::class)
                 ? new MessageSource(dirname(__DIR__) . '/messages')
                 : new IdMessageReader();
@@ -66,11 +64,7 @@ return [
                 ? new IntlMessageFormatter()
                 : new SimpleMessageFormatter();
 
-            return new CategorySource(
-                $params['yiirocks/recaptcha']['translation.category'],
-                $reader,
-                $formatter,
-            );
+            return new CategorySource('recaptcha', $reader, $formatter);
         },
         'tags' => ['translation.categorySource'],
     ],

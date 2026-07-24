@@ -294,7 +294,7 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
         );
 
         $this->assertStringContainsString('"timeout":5000', $base->withExecuteTimeout(5000)->render());
-        $this->assertStringContainsString('"timeout":15000', $base->render());
+        $this->assertStringContainsString('"timeout":5000', $base->render());
     }
     protected function fieldClass(): string
     {

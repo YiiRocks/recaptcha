@@ -19,7 +19,6 @@ abstract class AbstractRecaptchaRuleHandler implements RuleHandlerInterface
         private ?RecaptchaClient $client = null,
         private ?RequestProviderInterface $requestProvider = null,
         private ?TranslatorInterface $translator = null,
-        private string $translationCategory = 'recaptcha',
     ) {
     }
 
@@ -67,7 +66,7 @@ abstract class AbstractRecaptchaRuleHandler implements RuleHandlerInterface
         }
 
         if ($this->translator !== null) {
-            return $this->translator->translate($message, [], $this->translationCategory);
+            return $this->translator->translate($message, [], 'recaptcha');
         }
 
         return $message;
