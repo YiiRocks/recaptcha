@@ -1,6 +1,6 @@
 # Yii reCAPTCHA Change Log
 
-## 1.0.5 under development
+## 1.0.5 August 07, 2026
 
 - New: Add `badgeV3` param (`config/params.php`) for setting the v3 reCAPTCHA badge position/visibility
   app-wide via `RecaptchaRegistry`; per-field `RecaptchaV3Field::withBadge()` still overrides it
