@@ -17,6 +17,43 @@ use YiiRocks\Recaptcha\RecaptchaV2Type;
 final class RecaptchaV2FieldTest extends AbstractRecaptchaField
 {
 
+    public function testPerFieldV2OptionsOverrideRegistryDefaults(): void
+    {
+        RecaptchaRegistry::setV2Defaults(
+            theme: RecaptchaV2Theme::Dark,
+            size: RecaptchaV2Size::Compact,
+            type: RecaptchaV2Type::Audio,
+        );
+
+        $html = RecaptchaV2Field::field($this->createFormModel(), 'captcha')
+            ->withSiteKey('key-r')
+            ->withTheme(RecaptchaV2Theme::Light)
+            ->withSize(RecaptchaV2Size::Normal)
+            ->withType(RecaptchaV2Type::Image)
+            ->render();
+
+        $this->assertStringContainsString('data-theme="light"', $html);
+        $this->assertStringContainsString('data-size="normal"', $html);
+        $this->assertStringContainsString('data-type="image"', $html);
+    }
+
+    public function testRegistryV2DefaultsApplied(): void
+    {
+        RecaptchaRegistry::setV2Defaults(
+            theme: RecaptchaV2Theme::Dark,
+            size: RecaptchaV2Size::Compact,
+            type: RecaptchaV2Type::Audio,
+        );
+
+        $html = RecaptchaV2Field::field($this->createFormModel(), 'captcha')
+            ->withSiteKey('key-r')
+            ->render();
+
+        $this->assertStringContainsString('data-theme="dark"', $html);
+        $this->assertStringContainsString('data-size="compact"', $html);
+        $this->assertStringContainsString('data-type="audio"', $html);
+    }
+
     public function testRenderExactHtmlWithAllOptionsSet(): void
     {
         $html = RecaptchaV2Field::field($this->createFormModel(), 'captcha')

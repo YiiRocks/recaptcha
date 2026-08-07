@@ -1,5 +1,12 @@
 # Yii reCAPTCHA Change Log
 
+## 1.0.5 under development
+
+- New: Add `badgeV3` param (`config/params.php`) for setting the v3 reCAPTCHA badge position/visibility
+  app-wide via `RecaptchaRegistry`; per-field `RecaptchaV3Field::withBadge()` still overrides it
+- New: Add `themeV2`, `sizeV2` and `typeV2` params for setting the v2 widget theme/size/type app-wide via
+  `RecaptchaRegistry`; per-field `RecaptchaV2Field::withTheme()`/`withSize()`/`withType()` still override them
+
 ## 1.0.4 July 24, 2026
 
 - Chg: Extract shared abstract base classes `AbstractRecaptchaField`, `AbstractRecaptchaRule` and

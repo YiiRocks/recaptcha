@@ -25,7 +25,7 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
     private const string TERMS_OF_SERVICE_TEXT = 'Terms of Service';
     private const string TERMS_URL = 'https://policies.google.com/terms';
     private string $action = '';
-    private RecaptchaV3Badge $badge = RecaptchaV3Badge::BottomRight;
+    private ?RecaptchaV3Badge $badge = null;
     private int $executeTimeoutMs = 5000;
     private string $formId = '';
     private ?TranslatorInterface $translator = null;
@@ -156,6 +156,7 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
     protected function prepareRender(): void
     {
         $this->translator ??= RecaptchaRegistry::translator();
+        $this->badge ??= RecaptchaRegistry::badge() ?? RecaptchaV3Badge::BottomRight;
     }
 
     #[\Override]

@@ -14,9 +14,9 @@ final class RecaptchaV2Field extends AbstractRecaptchaField
     private string $errorCallback = '';
     private string $expiredCallback = '';
     private string $id = '';
-    private RecaptchaV2Size $size = RecaptchaV2Size::Normal;
-    private RecaptchaV2Theme $theme = RecaptchaV2Theme::Light;
-    private RecaptchaV2Type $type = RecaptchaV2Type::Image;
+    private ?RecaptchaV2Size $size = null;
+    private ?RecaptchaV2Theme $theme = null;
+    private ?RecaptchaV2Type $type = null;
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
@@ -78,13 +78,17 @@ final class RecaptchaV2Field extends AbstractRecaptchaField
 
         $siteKey = $this->siteKey ?? throw new Exception\MissingSiteKeyException();
 
+        $theme = $this->theme ?? RecaptchaRegistry::themeV2() ?? RecaptchaV2Theme::Light;
+        $type = $this->type ?? RecaptchaRegistry::typeV2() ?? RecaptchaV2Type::Image;
+        $size = $this->size ?? RecaptchaRegistry::sizeV2() ?? RecaptchaV2Size::Normal;
+
         $html = '<div'
             . ' id="' . $elementId . '"'
             . ' class="g-recaptcha"'
             . ' data-sitekey="' . $siteKey . '"'
-            . ' data-theme="' . $this->theme->value . '"'
-            . ' data-type="' . $this->type->value . '"'
-            . ' data-size="' . $this->size->value . '"';
+            . ' data-theme="' . $theme->value . '"'
+            . ' data-type="' . $type->value . '"'
+            . ' data-size="' . $size->value . '"';
 
         if ($this->callback !== '') {
             $html .= ' data-callback="' . $this->callback . '"';

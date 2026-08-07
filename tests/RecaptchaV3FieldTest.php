@@ -116,6 +116,29 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
         $this->assertStringContainsString('name="g-recaptcha-response"', $html);
     }
 
+    public function testPerFieldBadgeOverridesRegistryDefault(): void
+    {
+        RecaptchaRegistry::setBadgeDefault(RecaptchaV3Badge::Hidden);
+
+        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
+            ->withSiteKey('key-r')
+            ->withBadge(RecaptchaV3Badge::BottomRight)
+            ->render();
+
+        $this->assertStringNotContainsString('.grecaptcha-badge{visibility:hidden !important;}', $html);
+    }
+
+    public function testRegistryBadgeDefaultApplied(): void
+    {
+        RecaptchaRegistry::setBadgeDefault(RecaptchaV3Badge::Hidden);
+
+        $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
+            ->withSiteKey('key-r')
+            ->render();
+
+        $this->assertStringContainsString('.grecaptcha-badge{visibility:hidden !important;}', $html);
+    }
+
     public function testRenderExactHtmlWithDefaultBadgeAndAction(): void
     {
         $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
@@ -293,7 +316,7 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
             $base->withBadge(RecaptchaV3Badge::Hidden)->render(),
         );
 
-        $this->assertStringContainsString('"timeout":5000', $base->withExecuteTimeout(5000)->render());
+        $this->assertStringContainsString('"timeout":1234', $base->withExecuteTimeout(1234)->render());
         $this->assertStringContainsString('"timeout":5000', $base->render());
     }
     protected function fieldClass(): string

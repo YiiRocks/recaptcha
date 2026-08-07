@@ -14,6 +14,14 @@ return [
         RecaptchaRegistry::setContainerDefaults(
             $params['yiirocks/recaptcha']['container'] ?? [],
         );
+        RecaptchaRegistry::setBadgeDefault(
+            $params['yiirocks/recaptcha']['badgeV3'] ?? null,
+        );
+        RecaptchaRegistry::setV2Defaults(
+            theme: $params['yiirocks/recaptcha']['themeV2'] ?? null,
+            size: $params['yiirocks/recaptcha']['sizeV2'] ?? null,
+            type: $params['yiirocks/recaptcha']['typeV2'] ?? null,
+        );
         RecaptchaRegistry::configure(
             client: $container->has(RecaptchaClient::class)
                 ? $container->get(RecaptchaClient::class)
