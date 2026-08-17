@@ -49,4 +49,4 @@ composer require guzzlehttp/guzzle nyholm/psr7
 
 ## Documentation
 
-The complete reference guide is available at [Yii.rocks](https://www.yii.rocks/recaptcha/).
+The complete reference guide is available at [Yii.Rocks](https://www.yii.rocks/recaptcha/).
