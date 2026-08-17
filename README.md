@@ -29,8 +29,8 @@ Stats for Nerds
 ## Requirements
 
 - PHP 8.3+
-- PSR-18 HTTP client
 - PSR-17 request + stream factories
+- PSR-18 HTTP client
 
 ## Installation
 
@@ -49,22 +49,4 @@ composer require guzzlehttp/guzzle nyholm/psr7
 
 ## Documentation
 
-Configuration (site keys, secrets, DI wiring), field options for v2/v3, validation
-rule parameters, and usage examples are all covered at
-[Yii.rocks](https://www.yii.rocks/recaptcha/).
-
-## Testing
-
-```bash
-# Unit tests
-composer phpunit
-
-# Mutation testing
-composer infection
-
-# Static analysis
-composer psalm
-
-# Code style fixer
-composer php-cs-fixer
-```
+The complete reference guide is available at [Yii.rocks](https://www.yii.rocks/recaptcha/).
