@@ -40,7 +40,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "@stable",
-        "infection/infection": "^0.34.0",
+        "infection/infection": "^0.35.0",
         "nyholm/psr7": "@stable",
         "phpunit/phpunit": "@stable",
         "psr/container": "^2.0",
