@@ -2,6 +2,8 @@
 
 ## 1.0.6 under development
 
+- Chg: Move message translation files from `messages/` to `resources/messages/`
+
 ## 1.0.5 August 07, 2026
 
 - New: Add `badgeV3` param (`config/params.php`) for setting the v3 reCAPTCHA badge position/visibility

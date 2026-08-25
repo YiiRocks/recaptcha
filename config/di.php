@@ -57,7 +57,7 @@ return [
     'recaptcha.categorySource' => [
         'definition' => static function (): CategorySource {
             $reader = class_exists(MessageSource::class)
-                ? new MessageSource(dirname(__DIR__) . '/messages')
+                ? new MessageSource(dirname(__DIR__) . '/resources/messages')
                 : new IdMessageReader();
 
             $formatter = extension_loaded('intl')
