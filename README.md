@@ -23,7 +23,7 @@ Stats for Nerds
 - **reCAPTCHA v3** — score-based field that fetches its token on form submit (not page load), avoiding surprise challenge popups
 - **Server-side validation** — PHP attribute rules (`RecaptchaV2Rule` / `RecaptchaV3Rule`) verified against Google's siteverify endpoint
 - **Score threshold + action matching** — v3 rules can enforce a minimum score and an expected action name
-- **Zero-config ergonomics** — once site keys are set, fields and rules work out of the box via a static registry, no explicit DI wiring needed in views
+- **Zero-config ergonomics** — once site keys are set, fields and rules work out of the box via a static registry
 - **i18n** — validation and legal-notice messages are translated through Yii Translator
 
 ## Requirements
@@ -36,15 +36,6 @@ Stats for Nerds
 
 ```bash
 composer require yiirocks/recaptcha
-```
-
-A PSR-18 client and PSR-17 factories are required. If your application already
-has them configured (e.g. via Guzzle, Symfony HTTP Client, or any other
-implementation), no further setup is needed. If not, install any compatible
-library, for example:
-
-```bash
-composer require guzzlehttp/guzzle nyholm/psr7
 ```
 
 ## Documentation

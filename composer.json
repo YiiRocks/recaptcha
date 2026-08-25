@@ -43,8 +43,10 @@
         "infection/infection": "^0.35.0",
         "nyholm/psr7": "@stable",
         "phpunit/phpunit": "@stable",
+        "rector/rector": "^2.1.1",
         "psr/container": "^2.0",
         "vimeo/psalm": "^6.0",
+        "yiisoft/code-style": "^1.1",
         "yiisoft/translator-message-php": "^1.1"
     },
     "autoload": {
