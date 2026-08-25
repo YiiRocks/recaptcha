@@ -72,10 +72,14 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
     #[\Override]
     protected function generateInput(): string
     {
+        if ($this->siteKey === null) {
+            return '';
+        }
+
         /** @var string $name */
         $name = $this->getName();
         $fieldId = $this->inputId ?? ($name !== '' ? $name : 'g-recaptcha') . '-' . uniqid();
-        $siteKey = $this->siteKey ?? throw new Exception\MissingSiteKeyException();
+        $siteKey = $this->siteKey;
         $apiUrl = $this->jsApiUrl . '?render=' . $siteKey;
 
         $html = '';

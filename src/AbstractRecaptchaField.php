@@ -31,11 +31,13 @@ abstract class AbstractRecaptchaField extends InputField
     #[\Override]
     protected function beforeRender(): void
     {
-        $siteKey = $this->siteKey ?? $this->resolveSiteKey();
-        if ($siteKey === null || $siteKey === '') {
-            throw new Exception\MissingSiteKeyException();
+        $this->siteKey ??= $this->resolveSiteKey();
+
+        if ($this->siteKey === null || $this->siteKey === '') {
+            $this->useContainer = false;
+            $this->template = '';
+            return;
         }
-        $this->siteKey = $siteKey;
 
         $this->prepareRender();
 

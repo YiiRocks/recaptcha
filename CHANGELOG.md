@@ -2,6 +2,11 @@
 
 ## 1.0.6 under development
 
+- Chg: `RecaptchaV2Field`/`RecaptchaV3Field` no longer throw `MissingSiteKeyException` when no site key
+  is configured — they now silently render nothing instead; the now-unused exception class is removed
+- Chg: `RecaptchaV2RuleHandler`/`RecaptchaV3RuleHandler` no longer reject every submission when no site
+  key or secret is configured — verification is now skipped instead of calling Google with an empty
+  secret, or rejecting a token that could never arrive because the field silenced itself
 - Chg: Move message translation files from `messages/` to `resources/messages/`
 
 ## 1.0.5 August 07, 2026

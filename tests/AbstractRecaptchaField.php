@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Client\ClientInterface;
 use ReflectionClass;
 use ReflectionMethod;
-use YiiRocks\Recaptcha\Exception\MissingSiteKeyException;
 use YiiRocks\Recaptcha\RecaptchaClient;
 use YiiRocks\Recaptcha\RecaptchaConfig;
 use YiiRocks\Recaptcha\RecaptchaRegistry;
@@ -35,15 +34,13 @@ abstract class AbstractRecaptchaField extends TestCase
         RecaptchaRegistry::reset();
     }
 
-    public function testGenerateInputThrowsWhenSiteKeyNotSet(): void
+    public function testGenerateInputReturnsEmptyStringWhenSiteKeyNotSet(): void
     {
         $field = $this->field('captcha');
 
         $method = new ReflectionMethod($field, 'generateInput');
 
-        $this->expectException(MissingSiteKeyException::class);
-
-        $method->invoke($field);
+        $this->assertSame('', $method->invoke($field));
     }
 
     public function testMultipleWidgetsHaveUniqueIds(): void
@@ -105,6 +102,20 @@ abstract class AbstractRecaptchaField extends TestCase
 
         $this->assertStringNotContainsString('mb-3', $html);
         $this->assertStringStartsNotWith('<div class="mb-3">', $html);
+    }
+
+    public function testRendersEmptyWhenRegistryHasNoClientConfigured(): void
+    {
+        $reflection = new ReflectionClass(RecaptchaRegistry::class);
+        $property = $reflection->getProperty('client');
+        $property->setValue(null, null);
+
+        $this->assertSame('', $this->field('captcha')->render());
+    }
+
+    public function testRendersEmptyWithoutSiteKey(): void
+    {
+        $this->assertSame('', $this->field('captcha')->render());
     }
 
     public function testRenderWithContainerClass(): void
@@ -195,25 +206,6 @@ abstract class AbstractRecaptchaField extends TestCase
 
         $this->assertStringStartsWith('<div class="mb-3">' . "\n", $html);
         $this->assertStringEndsWith("\n" . '</div>', $html);
-    }
-
-    public function testThrowsWhenRegistryHasNoClientConfigured(): void
-    {
-        $reflection = new ReflectionClass(RecaptchaRegistry::class);
-        $property = $reflection->getProperty('client');
-        $property->setValue(null, null);
-
-        $this->expectException(MissingSiteKeyException::class);
-
-        $this->field('captcha')->render();
-    }
-
-    public function testThrowsWithoutSiteKey(): void
-    {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Site key must be set');
-
-        $this->field('captcha')->render();
     }
 
     protected function createFormModel(): FormModel

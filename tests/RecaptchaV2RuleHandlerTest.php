@@ -165,6 +165,29 @@ final class RecaptchaV2RuleHandlerTest extends AbstractRecaptchaRuleHandler
         $this->assertFalse($result->isValid());
     }
 
+    public function testValidateSkipsVerificationWhenSecretNotConfigured(): void
+    {
+        $client = $this->createClient(['success' => false], $this->createConfig(''));
+        $handler = new RecaptchaV2RuleHandler(client: $client);
+        $rule = new RecaptchaV2Rule();
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
+    }
+
+    public function testValidateSkipsVerificationWhenSiteKeyNotConfigured(): void
+    {
+        $config = new RecaptchaConfig(siteKeyV2: '', secretV2: 'configured-secret');
+        $client = $this->createClient(['success' => false], $config);
+        $handler = new RecaptchaV2RuleHandler(client: $client);
+        $rule = new RecaptchaV2Rule();
+
+        $result = $handler->validate('token', $rule, new ValidationContext());
+
+        $this->assertTrue($result->isValid());
+    }
+
     public function testValidateSuccess(): void
     {
         $rule = new RecaptchaV2Rule();
@@ -208,6 +231,6 @@ final class RecaptchaV2RuleHandlerTest extends AbstractRecaptchaRuleHandler
 
     protected function createConfig(string $secret, bool $sendRemoteIp = false): RecaptchaConfig
     {
-        return new RecaptchaConfig(secretV2: $secret, sendRemoteIp: $sendRemoteIp);
+        return new RecaptchaConfig(siteKeyV2: 'test-site-key', secretV2: $secret, sendRemoteIp: $sendRemoteIp);
     }
 }

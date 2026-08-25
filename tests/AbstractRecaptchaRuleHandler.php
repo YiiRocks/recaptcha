@@ -52,7 +52,7 @@ abstract class AbstractRecaptchaRuleHandler extends TestCase
         return [$client, $capture];
     }
 
-    protected function createClient(array $responseData): RecaptchaClient
+    protected function createClient(array $responseData, ?RecaptchaConfig $config = null): RecaptchaClient
     {
         $factory = new Psr17Factory();
         $httpClient = $this->createStub(ClientInterface::class);
@@ -60,7 +60,7 @@ abstract class AbstractRecaptchaRuleHandler extends TestCase
             new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData))),
         );
 
-        return new RecaptchaClient($this->createConfig('test-secret'), $httpClient, $factory, $factory);
+        return new RecaptchaClient($config ?? $this->createConfig('test-secret'), $httpClient, $factory, $factory);
     }
 
     abstract protected function createConfig(string $secret, bool $sendRemoteIp = false): RecaptchaConfig;

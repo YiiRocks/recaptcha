@@ -31,14 +31,21 @@ abstract class AbstractRecaptchaRuleHandler implements RuleHandlerInterface
 
         $result = new Result();
 
+        if ($rule->getSecret() === null && !$this->isConfigured()) {
+            return $result;
+        }
+
         if (!is_string($value) || $value === '') {
             $result->addError($this->translate($rule->getMessage()));
-        } else {
-            $this->verifyToken($value, $rule, $result);
+            return $result;
         }
+
+        $this->verifyToken($value, $rule, $result);
 
         return $result;
     }
+
+    abstract protected function isConfigured(): bool;
 
     protected function resolveClient(): RecaptchaClient
     {

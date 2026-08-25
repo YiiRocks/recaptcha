@@ -74,9 +74,12 @@ final class RecaptchaV2Field extends AbstractRecaptchaField
     #[\Override]
     protected function generateInput(): string
     {
-        $elementId = $this->id !== '' ? $this->id : 'g-recaptcha-' . uniqid();
+        if ($this->siteKey === null) {
+            return '';
+        }
 
-        $siteKey = $this->siteKey ?? throw new Exception\MissingSiteKeyException();
+        $elementId = $this->id !== '' ? $this->id : 'g-recaptcha-' . uniqid();
+        $siteKey = $this->siteKey;
 
         $theme = $this->theme ?? RecaptchaRegistry::themeV2() ?? RecaptchaV2Theme::Light;
         $type = $this->type ?? RecaptchaRegistry::typeV2() ?? RecaptchaV2Type::Image;

@@ -10,6 +10,14 @@ use Yiisoft\Validator\RuleInterface;
 final class RecaptchaV3RuleHandler extends AbstractRecaptchaRuleHandler
 {
     #[\Override]
+    protected function isConfigured(): bool
+    {
+        $config = $this->resolveClient()->getConfig();
+
+        return $config->siteKeyV3 !== '' && $config->secretV3 !== '';
+    }
+
+    #[\Override]
     protected function ruleClass(): string
     {
         return RecaptchaV3Rule::class;
