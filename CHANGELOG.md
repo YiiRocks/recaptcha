@@ -1,5 +1,7 @@
 # Yii reCAPTCHA Change Log
 
+## 1.0.7 under development
+
 ## 1.0.6 - August 25, 2026
 
 - Chg: `RecaptchaV2Field`/`RecaptchaV3Field` no longer throw `MissingSiteKeyException` when no site key
