@@ -1,4 +1,4 @@
-# Yii reCAPTCHA Change Log
+# Yii3 reCAPTCHA Changelog
 
 ## 1.0.7 under development
 
