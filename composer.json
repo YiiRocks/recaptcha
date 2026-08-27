@@ -93,8 +93,7 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "infection/extension-installer": true,
-            "yiisoft/config": true
+            "infection/extension-installer": true
         }
     },
     "funding": [
