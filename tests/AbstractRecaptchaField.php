@@ -154,7 +154,7 @@ abstract class AbstractRecaptchaField extends TestCase
         $result = new Result();
         $result->addError('The captcha is invalid.', valuePath: ['captcha']);
 
-        $formModel = new class() extends FormModel {
+        $formModel = new class extends FormModel {
             public string $captcha = '';
         };
         $formModel->processValidationResult($result);
@@ -169,7 +169,7 @@ abstract class AbstractRecaptchaField extends TestCase
         $result = new Result();
         $result->addError('The captcha is invalid.', valuePath: ['captcha']);
 
-        $formModel = new class() extends FormModel {
+        $formModel = new class extends FormModel {
             public string $captcha = '';
             public string $other = '';
         };
@@ -182,7 +182,7 @@ abstract class AbstractRecaptchaField extends TestCase
 
     public function testRenderWithFormModelShowsNoErrorsWhenNoErrors(): void
     {
-        $formModel = new class() extends FormModel {
+        $formModel = new class extends FormModel {
             public string $captcha = '';
         };
         $formModel->processValidationResult(new Result());
@@ -210,7 +210,7 @@ abstract class AbstractRecaptchaField extends TestCase
 
     protected function createFormModel(): FormModel
     {
-        return new class() extends FormModel {
+        return new class extends FormModel {
             public string $captcha = '';
         };
     }

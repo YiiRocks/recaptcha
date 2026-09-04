@@ -15,6 +15,7 @@ use YiiRocks\Recaptcha\RecaptchaV3RuleHandler;
 use Yiisoft\RequestProvider\RequestProvider;
 use Yiisoft\Translator\TranslatorInterface;
 use Yiisoft\Validator\ValidationContext;
+use InvalidArgumentException;
 
 final class RecaptchaV3RuleHandlerTest extends AbstractRecaptchaRuleHandler
 {
@@ -116,7 +117,7 @@ final class RecaptchaV3RuleHandlerTest extends AbstractRecaptchaRuleHandler
 
     public function testInvalidThreshold(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         new RecaptchaV3Rule(threshold: 1.5);
     }

@@ -16,7 +16,6 @@ use YiiRocks\Recaptcha\RecaptchaV2Type;
 
 final class RecaptchaV2FieldTest extends AbstractRecaptchaField
 {
-
     public function testPerFieldV2OptionsOverrideRegistryDefaults(): void
     {
         RecaptchaRegistry::setV2Defaults(
@@ -135,6 +134,7 @@ final class RecaptchaV2FieldTest extends AbstractRecaptchaField
         );
         $this->assertStringNotContainsString('data-error-callback', $base->render());
     }
+
     protected function fieldClass(): string
     {
         return RecaptchaV2Field::class;

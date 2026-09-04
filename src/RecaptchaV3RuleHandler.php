@@ -6,10 +6,11 @@ namespace YiiRocks\Recaptcha;
 
 use Yiisoft\Validator\Result;
 use Yiisoft\Validator\RuleInterface;
+use Override;
 
 final class RecaptchaV3RuleHandler extends AbstractRecaptchaRuleHandler
 {
-    #[\Override]
+    #[Override]
     protected function isConfigured(): bool
     {
         $config = $this->resolveClient()->getConfig();
@@ -17,13 +18,13 @@ final class RecaptchaV3RuleHandler extends AbstractRecaptchaRuleHandler
         return $config->siteKeyV3 !== '' && $config->secretV3 !== '';
     }
 
-    #[\Override]
+    #[Override]
     protected function ruleClass(): string
     {
         return RecaptchaV3Rule::class;
     }
 
-    #[\Override]
+    #[Override]
     protected function supports(RuleInterface $rule): bool
     {
         return $rule instanceof RecaptchaV3Rule;
@@ -32,7 +33,7 @@ final class RecaptchaV3RuleHandler extends AbstractRecaptchaRuleHandler
     /**
      * @param RecaptchaV3Rule $rule
      */
-    #[\Override]
+    #[Override]
     protected function verifyToken(string $value, RuleInterface $rule, Result $result): void
     {
         $clientIp = $rule->getSendRemoteIp() ? $this->resolveClientIp() : null;

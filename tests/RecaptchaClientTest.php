@@ -12,6 +12,8 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use YiiRocks\Recaptcha\RecaptchaClient;
 use YiiRocks\Recaptcha\RecaptchaConfig;
+use Psr\Http\Client\ClientExceptionInterface;
+use RuntimeException;
 
 final class RecaptchaClientTest extends TestCase
 {
@@ -27,8 +29,8 @@ final class RecaptchaClientTest extends TestCase
 
     public function testHttpClientExceptionReturnsFailure(): void
     {
-        $client = $this->createStub(\Psr\Http\Client\ClientInterface::class);
-        $exception = new class('Connection error') extends \RuntimeException implements \Psr\Http\Client\ClientExceptionInterface {};
+        $client = $this->createStub(ClientInterface::class);
+        $exception = new class ('Connection error') extends RuntimeException implements ClientExceptionInterface {};
         $client->method('sendRequest')->willThrowException($exception);
 
         $recaptchaClient = $this->_createClient($client);
@@ -242,7 +244,7 @@ final class RecaptchaClientTest extends TestCase
      */
     private function _createCapturingClient(array $responseData): array
     {
-        $capture = new class() {
+        $capture = new class {
             public ?RequestInterface $request = null;
         };
 

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace YiiRocks\Recaptcha;
 
 use Attribute;
+use Override;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class RecaptchaV2Rule extends AbstractRecaptchaRule
 {
-    #[\Override]
+    #[Override]
     public function getHandler(): string
     {
         return RecaptchaV2RuleHandler::class;

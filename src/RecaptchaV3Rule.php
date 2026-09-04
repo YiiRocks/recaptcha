@@ -6,6 +6,8 @@ namespace YiiRocks\Recaptcha;
 
 use Attribute;
 use Closure;
+use InvalidArgumentException;
+use Override;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class RecaptchaV3Rule extends AbstractRecaptchaRule
@@ -35,7 +37,7 @@ final class RecaptchaV3Rule extends AbstractRecaptchaRule
         );
 
         if ($this->threshold < 0.0 || $this->threshold > 1.0) {
-            throw new \InvalidArgumentException('Threshold must be between 0.0 and 1.0.');
+            throw new InvalidArgumentException('Threshold must be between 0.0 and 1.0.');
         }
     }
 
@@ -49,7 +51,7 @@ final class RecaptchaV3Rule extends AbstractRecaptchaRule
         return $this->actionMismatchMessage;
     }
 
-    #[\Override]
+    #[Override]
     public function getHandler(): string
     {
         return RecaptchaV3RuleHandler::class;

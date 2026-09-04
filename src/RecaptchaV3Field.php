@@ -8,10 +8,10 @@ use Yiisoft\FormModel\FormModelInputData;
 use Yiisoft\FormModel\FormModelInterface;
 use Yiisoft\Html\Html;
 use Yiisoft\Translator\TranslatorInterface;
+use Override;
 
 final class RecaptchaV3Field extends AbstractRecaptchaField
 {
-
     private const string DEFAULT_LEGAL_NOTICE = 'This site is protected by reCAPTCHA and the Google '
         . '<a href="' . self::PRIVACY_URL . '">' . self::PRIVACY_POLICY_TEXT . '</a> and '
         . '<a href="' . self::TERMS_URL . '">' . self::TERMS_OF_SERVICE_TEXT . '</a> apply.';
@@ -29,6 +29,7 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
     private int $executeTimeoutMs = 5000;
     private string $formId = '';
     private ?TranslatorInterface $translator = null;
+
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
@@ -69,7 +70,7 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
         return $new;
     }
 
-    #[\Override]
+    #[Override]
     protected function generateInput(): string
     {
         if ($this->siteKey === null) {
@@ -156,14 +157,14 @@ final class RecaptchaV3Field extends AbstractRecaptchaField
         return $html;
     }
 
-    #[\Override]
+    #[Override]
     protected function prepareRender(): void
     {
         $this->translator ??= RecaptchaRegistry::translator();
         $this->badge ??= RecaptchaRegistry::badge() ?? RecaptchaV3Badge::BottomRight;
     }
 
-    #[\Override]
+    #[Override]
     protected function resolveSiteKey(): ?string
     {
         return RecaptchaRegistry::client()?->getConfig()->siteKeyV3;

@@ -16,7 +16,6 @@ use Yiisoft\Translator\TranslatorInterface;
 
 final class RecaptchaV3FieldTest extends AbstractRecaptchaField
 {
-
     public function testDefaultFieldIdIsDerivedFromFieldName(): void
     {
         $html = RecaptchaV3Field::field($this->createFormModel(), 'captcha')
@@ -56,7 +55,7 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
 
     public function testFieldAutoDerivesNameFromFormModel(): void
     {
-        $formModel = new class() extends FormModel {
+        $formModel = new class extends FormModel {
             public string $captcha = '';
         };
 
@@ -69,8 +68,9 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
 
     public function testFieldAutoDerivesNameFromNamedFormModel(): void
     {
-        $formModel = new class() extends FormModel {
+        $formModel = new class extends FormModel {
             public string $captcha = '';
+
             public function getFormName(): string
             {
                 return 'ContactForm';
@@ -100,8 +100,9 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
 
     public function testNameOverridesAutoDerivation(): void
     {
-        $formModel = new class() extends FormModel {
+        $formModel = new class extends FormModel {
             public string $captcha = '';
+
             public function getFormName(): string
             {
                 return 'ContactForm';
@@ -251,8 +252,8 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
                         [$params['privacyPolicy'] ?? '', $params['termsOfService'] ?? ''],
                         match ($category) {
                             'recaptcha' => match ($id) {
-                                'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.' =>
-                                    'Diese Seite ist durch reCAPTCHA geschützt und es gelten die Google {privacyPolicy} und {termsOfService}.',
+                                'This site is protected by reCAPTCHA and the Google {privacyPolicy} and {termsOfService} apply.'
+                                    => 'Diese Seite ist durch reCAPTCHA geschützt und es gelten die Google {privacyPolicy} und {termsOfService}.',
                                 default => $id,
                             },
                             default => $id,
@@ -319,6 +320,7 @@ final class RecaptchaV3FieldTest extends AbstractRecaptchaField
         $this->assertStringContainsString('"timeout":1234', $base->withExecuteTimeout(1234)->render());
         $this->assertStringContainsString('"timeout":5000', $base->render());
     }
+
     protected function fieldClass(): string
     {
         return RecaptchaV3Field::class;

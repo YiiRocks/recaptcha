@@ -12,6 +12,7 @@ use Yiisoft\Validator\Result;
 use Yiisoft\Validator\RuleHandlerInterface;
 use Yiisoft\Validator\RuleInterface;
 use Yiisoft\Validator\ValidationContext;
+use Override;
 
 abstract class AbstractRecaptchaRuleHandler implements RuleHandlerInterface
 {
@@ -19,10 +20,9 @@ abstract class AbstractRecaptchaRuleHandler implements RuleHandlerInterface
         private ?RecaptchaClient $client = null,
         private ?RequestProviderInterface $requestProvider = null,
         private ?TranslatorInterface $translator = null,
-    ) {
-    }
+    ) {}
 
-    #[\Override]
+    #[Override]
     public function validate(mixed $value, RuleInterface $rule, ValidationContext $context): Result
     {
         if (!$rule instanceof AbstractRecaptchaRule || !$this->supports($rule)) {
@@ -68,9 +68,7 @@ abstract class AbstractRecaptchaRuleHandler implements RuleHandlerInterface
 
     protected function translate(string $message): string
     {
-        if ($this->translator === null) {
-            $this->translator = RecaptchaRegistry::translator();
-        }
+        $this->translator ??= RecaptchaRegistry::translator();
 
         if ($this->translator !== null) {
             return $this->translator->translate($message, [], 'recaptcha');

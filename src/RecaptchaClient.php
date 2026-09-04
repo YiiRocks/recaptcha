@@ -17,8 +17,7 @@ final readonly class RecaptchaClient
         private ClientInterface $httpClient,
         private RequestFactoryInterface $requestFactory,
         private StreamFactoryInterface $streamFactory,
-    ) {
-    }
+    ) {}
 
     public function getConfig(): RecaptchaConfig
     {

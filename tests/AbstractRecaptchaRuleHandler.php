@@ -11,6 +11,7 @@ use Psr\Http\Message\RequestInterface;
 use YiiRocks\Recaptcha\RecaptchaClient;
 use YiiRocks\Recaptcha\RecaptchaConfig;
 use YiiRocks\Recaptcha\RecaptchaRegistry;
+use Nyholm\Psr7\Response;
 
 abstract class AbstractRecaptchaRuleHandler extends TestCase
 {
@@ -31,7 +32,7 @@ abstract class AbstractRecaptchaRuleHandler extends TestCase
      */
     protected function createCapturingClient(array $responseData, bool $sendRemoteIp = false): array
     {
-        $capture = new class() {
+        $capture = new class {
             public ?RequestInterface $request = null;
         };
 
@@ -41,7 +42,7 @@ abstract class AbstractRecaptchaRuleHandler extends TestCase
                 $capture->request = $request;
                 $factory = new Psr17Factory();
 
-                return new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData)));
+                return new Response(200, [], $factory->createStream(json_encode($responseData)));
             },
         );
 
@@ -57,7 +58,7 @@ abstract class AbstractRecaptchaRuleHandler extends TestCase
         $factory = new Psr17Factory();
         $httpClient = $this->createStub(ClientInterface::class);
         $httpClient->method('sendRequest')->willReturn(
-            new \Nyholm\Psr7\Response(200, [], $factory->createStream(json_encode($responseData))),
+            new Response(200, [], $factory->createStream(json_encode($responseData))),
         );
 
         return new RecaptchaClient($config ?? $this->createConfig('test-secret'), $httpClient, $factory, $factory);

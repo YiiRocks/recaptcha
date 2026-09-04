@@ -6,6 +6,7 @@ namespace YiiRocks\Recaptcha;
 
 use Yiisoft\Form\Field\Base\InputField;
 use Yiisoft\Html\Html;
+use Override;
 
 abstract class AbstractRecaptchaField extends InputField
 {
@@ -28,7 +29,7 @@ abstract class AbstractRecaptchaField extends InputField
         return $new;
     }
 
-    #[\Override]
+    #[Override]
     protected function beforeRender(): void
     {
         $this->siteKey ??= $this->resolveSiteKey();
@@ -59,9 +60,7 @@ abstract class AbstractRecaptchaField extends InputField
         $attributes = RecaptchaRegistry::containerAttributes();
         if ($attributes !== null) {
             foreach ($attributes as $key => $value) {
-                if (!isset($this->containerAttributes[$key])) {
-                    $this->containerAttributes[$key] = $value;
-                }
+                $this->containerAttributes[$key] ??= $value;
             }
         }
 

@@ -6,10 +6,10 @@ namespace YiiRocks\Recaptcha;
 
 use Yiisoft\FormModel\FormModelInputData;
 use Yiisoft\FormModel\FormModelInterface;
+use Override;
 
 final class RecaptchaV2Field extends AbstractRecaptchaField
 {
-
     private string $callback = '';
     private string $errorCallback = '';
     private string $expiredCallback = '';
@@ -17,6 +17,7 @@ final class RecaptchaV2Field extends AbstractRecaptchaField
     private ?RecaptchaV2Size $size = null;
     private ?RecaptchaV2Theme $theme = null;
     private ?RecaptchaV2Type $type = null;
+
     public static function field(FormModelInterface $formModel, string $attribute): static
     {
         return (new static())->inputData(new FormModelInputData($formModel, $attribute));
@@ -71,7 +72,7 @@ final class RecaptchaV2Field extends AbstractRecaptchaField
         return $new;
     }
 
-    #[\Override]
+    #[Override]
     protected function generateInput(): string
     {
         if ($this->siteKey === null) {
@@ -109,12 +110,10 @@ final class RecaptchaV2Field extends AbstractRecaptchaField
         return $html;
     }
 
-    #[\Override]
-    protected function prepareRender(): void
-    {
-    }
+    #[Override]
+    protected function prepareRender(): void {}
 
-    #[\Override]
+    #[Override]
     protected function resolveSiteKey(): ?string
     {
         return RecaptchaRegistry::client()?->getConfig()->siteKeyV2;
